@@ -1,0 +1,11 @@
+{
+  "status": "done",
+  "message": "Selesai membuat semua invoice.",
+  "progress_percent": 100,
+  "processed_orders": 100,
+  "total_orders": 100,
+  "current_invoice": "",
+  "output_pdf": "C:\\Users\\IT\\Documents\\INVOICE\\backend_invoice\\outputs\\invoices_output_479d5e139e8c41e3b55ef195220d3d5f.pdf",
+  "error": "",
+  "updated_at": 1774950886
+}
