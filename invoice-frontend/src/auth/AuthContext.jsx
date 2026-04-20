@@ -30,7 +30,7 @@ export function AuthProvider({ children }) {
     }
   }, [token]);
 
-  // Intercept 401 → logout
+  // Intercept 401 → logout + redirect
   useEffect(() => {
     const id = axios.interceptors.response.use(
       (res) => res,
@@ -50,64 +50,71 @@ export function AuthProvider({ children }) {
     const tokenFromUrl = params.get("token");
 
     if (tokenFromUrl) {
-      // Bersihkan token dari URL
+      // Bersihkan token dari URL biar tidak keliatan di browser
       const url = new URL(window.location.href);
       url.searchParams.delete("token");
+      url.searchParams.delete("source");
+      url.searchParams.delete("project");
       window.history.replaceState({}, "", url.toString());
 
-      saveToken(tokenFromUrl);
+      processToken(tokenFromUrl);
       return;
     }
 
-    // Kalau sudah ada token di storage, verifikasi ke backend
+    // Kalau sudah ada token di storage, decode ulang untuk validasi lokal
     if (token) {
-      verifyToken(token);
+      processToken(token);
     } else {
       setLoading(false);
     }
   }, []);
 
-  const saveToken = useCallback(async (newToken) => {
-    setLoading(true);
-    setError(null);
-    localStorage.setItem(TOKEN_KEY, newToken);
-    setToken(newToken);
-    axios.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
-    await verifyToken(newToken);
-  }, []);
+  // Decode JWT payload di frontend (tidak verifikasi signature — itu urusan backend)
+  const decodeJwt = (tkn) => {
+    const parts = tkn.split(".");
+    if (parts.length !== 3) throw new Error("Format token tidak valid");
+    const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    return JSON.parse(atob(base64));
+  };
 
-  const verifyToken = async (tkn) => {
+  const processToken = useCallback((tkn) => {
     try {
-      const res = await axios.get("/progress/__ping__", {
-        headers: { Authorization: `Bearer ${tkn}` },
-        validateStatus: (s) => s !== 401,
-      }).catch(async () => {
-        // Fallback: verifikasi langsung ke pilargroup
-        return axios.get(`${PILARGROUP_URL}/api/auth/me`, {
-          headers: { Authorization: `Bearer ${tkn}` },
-        });
-      });
+      const payload = decodeJwt(tkn);
 
-      if (res.status === 401) {
+      // Cek expired
+      if (payload.exp && payload.exp * 1000 < Date.now()) {
         throw new Error("Token expired");
       }
 
-      // Ambil data user dari pilargroup
-      const meRes = await axios.get(`${PILARGROUP_URL}/api/auth/me`, {
-        headers: { Authorization: `Bearer ${tkn}` },
-      });
+      // Cek akses billforge
+      const apps = payload.apps || [];
+      if (!apps.includes("billforge")) {
+        throw new Error("Akun tidak punya akses BillForge");
+      }
 
-      const userData = meRes.data;
-      setUser(userData);
-      localStorage.setItem(USER_KEY, JSON.stringify(userData));
+      const userData = {
+        id: payload.sub,
+        internal_id: payload.internal_id,
+        username: payload.username,
+        name: payload.name,
+        email: payload.email,
+        phone: payload.phone,
+        department: payload.department,
+        job_position: payload.job_position,
+        apps: payload.apps,
+      };
+
       localStorage.setItem(TOKEN_KEY, tkn);
+      localStorage.setItem(USER_KEY, JSON.stringify(userData));
+      axios.defaults.headers.common["Authorization"] = `Bearer ${tkn}`;
       setToken(tkn);
+      setUser(userData);
     } catch {
       logout();
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const logout = useCallback(() => {
     localStorage.removeItem(TOKEN_KEY);
@@ -118,7 +125,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const redirectToLogin = useCallback(() => {
-    const returnUrl = encodeURIComponent(window.location.href);
+    const returnUrl = encodeURIComponent(window.location.origin);
     window.location.href = `${PILARGROUP_URL}?redirect=${returnUrl}`;
   }, []);
 
