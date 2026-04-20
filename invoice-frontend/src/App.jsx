@@ -142,6 +142,8 @@ function InvoiceApp() {
 
   const handleFileChange = (file) => {
     setSelectedFile(file);
+    // Kalau null berarti dari tombol X — cukup hapus file, state lain tetap
+    if (file === null) return;
     setResult(null);
     setStatusText("File siap diproses.");
     setProgress(0);

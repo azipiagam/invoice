@@ -1,5 +1,3 @@
-from dotenv import load_dotenv
-load_dotenv()
 from pathlib import Path
 import shutil
 import threading
@@ -228,10 +226,7 @@ def get_progress(
 
 
 @app.get("/preview/{filename}")
-def preview_file(
-    filename: str,
-    current_user: dict = Depends(verify_token),
-):
+def preview_file(filename: str):
     file_path = OUTPUT_DIR / filename
 
     if not file_path.exists():
@@ -250,10 +245,7 @@ def preview_file(
 
 
 @app.get("/download/{filename}")
-def download_file(
-    filename: str,
-    current_user: dict = Depends(verify_token),
-):
+def download_file(filename: str):
     file_path = OUTPUT_DIR / filename
 
     if not file_path.exists():
