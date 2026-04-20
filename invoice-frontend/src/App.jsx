@@ -16,6 +16,8 @@ import Header from "./components/Header";
 import UploadCard from "./components/UploadCard";
 import ProcessStatus from "./components/ProcessStatus";
 import ResultCard from "./components/ResultCard";
+import { AuthProvider } from "./auth/AuthContext";
+import ProtectedRoute from "./auth/ProtectedRoute";
 
 const API_BASE = "";
 const POLL_INTERVAL_MS = 1500;
@@ -69,7 +71,7 @@ const snackbarConfig = {
   },
 };
 
-export default function App() {
+function InvoiceApp() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [outputFolder, setOutputFolder] = useState("invoices_output");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -82,19 +84,16 @@ export default function App() {
     message: "",
   });
 
-  // ── State tambahan untuk polling & ProcessStatus ──────────────────────────
   const [jobStatus, setJobStatus] = useState("idle");
   const [currentInvoice, setCurrentInvoice] = useState("");
   const [currentCount, setCurrentCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
   const [errorMsg, setErrorMsg] = useState("");
   const pollRef = useRef(null);
-  // ─────────────────────────────────────────────────────────────────────────
 
   const showSnackbar = (message, severity = "success") =>
     setSnackbar({ open: true, severity, message });
 
-  // ── Stop polling helper ───────────────────────────────────────────────────
   const stopPolling = () => {
     if (pollRef.current) {
       clearInterval(pollRef.current);
@@ -102,7 +101,6 @@ export default function App() {
     }
   };
 
-  // ── Start polling setelah dapat job_id ────────────────────────────────────
   const startPolling = (jobId) => {
     stopPolling();
 
@@ -111,7 +109,6 @@ export default function App() {
         const res = await axios.get(`${API_BASE}/progress/${jobId}`);
         const data = res.data;
 
-        // Sync semua state progress dari response backend
         setJobStatus(data.status);
         setProgress(data.percent ?? 0);
         setStatusText(data.message ?? "");
@@ -138,19 +135,16 @@ export default function App() {
           showSnackbar(data.error || "Gagal memproses invoice.", "error");
         }
       } catch (err) {
-        // Jangan stop polling karena network hiccup sementara
         console.warn("[polling error]", err);
       }
     }, POLL_INTERVAL_MS);
   };
-  // ─────────────────────────────────────────────────────────────────────────
 
   const handleFileChange = (file) => {
     setSelectedFile(file);
     setResult(null);
     setStatusText("File siap diproses.");
     setProgress(0);
-    // Reset polling state
     setJobStatus("idle");
     setCurrentInvoice("");
     setCurrentCount(0);
@@ -166,7 +160,6 @@ export default function App() {
     setProgress(0);
     setStatusText("Belum ada proses.");
     setResult(null);
-    // Reset polling state
     setJobStatus("idle");
     setCurrentInvoice("");
     setCurrentCount(0);
@@ -218,10 +211,8 @@ export default function App() {
       );
 
       const data = response.data;
-      console.log("API RESPONSE:", data);
 
       if (!data.job_id) {
-        // Fallback: backend tidak support async job (response langsung selesai)
         setResult(data);
         setProgress(100);
         setJobStatus("completed");
@@ -231,17 +222,11 @@ export default function App() {
         return;
       }
 
-      // ── Backend async: mulai polling progress ─────────────────────────────
       setStatusText("File berhasil diupload, menunggu proses backend...");
       setJobStatus("queued");
       startPolling(data.job_id);
-      // isProcessing tetap true — akan di-set false oleh polling saat selesai
-      // ─────────────────────────────────────────────────────────────────────
 
     } catch (error) {
-      console.error("Generate invoice error:", error);
-      console.error("Generate invoice error detail:", error.response?.data);
-
       let errorMessage = "Gagal memproses invoice.";
       if (error.response?.data?.detail) {
         errorMessage = error.response.data.detail;
@@ -265,57 +250,52 @@ export default function App() {
   const cfg = snackbarConfig[snackbar.severity] ?? snackbarConfig.info;
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
+    <Box sx={{ minHeight: "100vh", width: "100%" }}>
+      <Container
+        maxWidth="lg"
+        sx={{ py: { xs: 3, md: 5 }, position: "relative", zIndex: 1 }}
+      >
+        <Stack spacing={3}>
+          <Header />
 
-      <Box sx={{ minHeight: "100vh", width: "100%" }}>
-        <Container
-          maxWidth="lg"
-          sx={{ py: { xs: 3, md: 5 }, position: "relative", zIndex: 1 }}
-        >
-          <Stack spacing={3}>
-            <Header />
+          <UploadCard
+            selectedFile={selectedFile}
+            outputFolder={outputFolder}
+            setOutputFolder={setOutputFolder}
+            onFileChange={handleFileChange}
+            onGenerate={handleGenerate}
+            onReset={handleReset}
+            isProcessing={isProcessing}
+          />
 
-            <UploadCard
-              selectedFile={selectedFile}
-              outputFolder={outputFolder}
-              setOutputFolder={setOutputFolder}
-              onFileChange={handleFileChange}
-              onGenerate={handleGenerate}
-              onReset={handleReset}
-              isProcessing={isProcessing}
-            />
+          <ProcessStatus
+            isProcessing={isProcessing}
+            progress={progress}
+            statusText={statusText}
+            selectedFile={selectedFile}
+            jobStatus={jobStatus}
+            currentInvoice={currentInvoice}
+            current={currentCount}
+            total={totalCount}
+            error={errorMsg}
+          />
 
-            {/* ProcessStatus sekarang menerima props polling yang lengkap */}
-            <ProcessStatus
-              isProcessing={isProcessing}
-              progress={progress}
-              statusText={statusText}
-              selectedFile={selectedFile}
-              jobStatus={jobStatus}
-              currentInvoice={currentInvoice}
-              current={currentCount}
-              total={totalCount}
-              error={errorMsg}
-            />
+          {result && <ResultCard result={result} />}
+        </Stack>
 
-            {result && <ResultCard result={result} />}
-          </Stack>
-
-          <Box sx={{ mt: 5, mb: 1, textAlign: "center" }}>
-            <Typography
-              sx={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: "0.75rem",
-                color: "rgba(14,60,110,0.3)",
-                letterSpacing: "0.04em",
-              }}
-            >
-              Invoice Generator •  PT Pilar Niaga Makmur
-            </Typography>
-          </Box>
-        </Container>
-      </Box>
+        <Box sx={{ mt: 5, mb: 1, textAlign: "center" }}>
+          <Typography
+            sx={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: "0.75rem",
+              color: "rgba(14,60,110,0.3)",
+              letterSpacing: "0.04em",
+            }}
+          >
+            Invoice Generator • PT Pilar Niaga Makmur
+          </Typography>
+        </Box>
+      </Container>
 
       <Snackbar
         open={snackbar.open}
@@ -375,6 +355,19 @@ export default function App() {
           </Box>
         </Box>
       </Snackbar>
+    </Box>
+  );
+}
+
+export default function App() {
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <AuthProvider>
+        <ProtectedRoute>
+          <InvoiceApp />
+        </ProtectedRoute>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

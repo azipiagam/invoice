@@ -1,15 +1,18 @@
+from dotenv import load_dotenv
+load_dotenv()
 from pathlib import Path
 import shutil
 import threading
 import time
 from datetime import datetime
 
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from invoice_generator import convert_excel_to_single_pdf
+from auth import verify_token
 
 app = FastAPI(title="Premium Invoice API")
 
@@ -138,10 +141,13 @@ def process_invoice_job(job_id, excel_path: Path, pdf_path: Path):
         safe_delete_file(excel_path)
 
 
+# ── Protected routes (semua butuh JWT) ────────────────────────────────────────
+
 @app.post("/generate-invoices")
 async def generate_invoices(
     file: UploadFile = File(...),
     output_folder: str = Form("invoice_premium"),
+    current_user: dict = Depends(verify_token),
 ):
     try:
         if not file.filename:
@@ -182,6 +188,7 @@ async def generate_invoices(
             success=False,
             error=None,
             created_at=datetime.now().isoformat(),
+            triggered_by=current_user.get("name", current_user.get("username", "unknown")),
         )
 
         thread = threading.Thread(
@@ -208,7 +215,10 @@ async def generate_invoices(
 
 
 @app.get("/progress/{job_id}")
-def get_progress(job_id: str):
+def get_progress(
+    job_id: str,
+    current_user: dict = Depends(verify_token),
+):
     job = get_job_progress(job_id)
 
     if not job:
@@ -218,7 +228,10 @@ def get_progress(job_id: str):
 
 
 @app.get("/preview/{filename}")
-def preview_file(filename: str):
+def preview_file(
+    filename: str,
+    current_user: dict = Depends(verify_token),
+):
     file_path = OUTPUT_DIR / filename
 
     if not file_path.exists():
@@ -237,7 +250,10 @@ def preview_file(filename: str):
 
 
 @app.get("/download/{filename}")
-def download_file(filename: str):
+def download_file(
+    filename: str,
+    current_user: dict = Depends(verify_token),
+):
     file_path = OUTPUT_DIR / filename
 
     if not file_path.exists():
@@ -255,6 +271,8 @@ def download_file(filename: str):
         },
     )
 
+
+# ── Frontend (SPA) — tidak butuh auth, browser handle redirect ────────────────
 
 if FRONTEND_DIST.exists():
     app.mount(
