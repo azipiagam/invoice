@@ -3,6 +3,8 @@ import jwt
 from fastapi import HTTPException, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
+# Konfigurasi JWT
+
 JWT_SECRET = os.getenv("JWT_SECRET", "")
 JWT_ALGORITHM = "HS256"
 BILLFORGE_APP_KEY = os.getenv("BILLFORGE_APP_KEY", "billforge")
