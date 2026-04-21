@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { AppBar, Box, Chip, Stack, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, Stack, Toolbar, Typography } from "@mui/material";
 import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded";
+import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 
 export default function Layout({ children }) {
   const [now, setNow] = useState(new Date());
@@ -34,7 +35,17 @@ export default function Layout({ children }) {
   const dayNum = now.getDate();
   const monthShort = now.toLocaleDateString("id-ID", { month: "short" });
 
-  const CalendarPill = ({ dateSize, monthSize, timeSize, subSize, px, py, minW, borderRadius, showFull }) => (
+  const CalendarPill = ({
+    dateSize,
+    monthSize,
+    timeSize,
+    subSize,
+    px,
+    py,
+    minW,
+    borderRadius,
+    showFull,
+  }) => (
     <Stack
       direction="row"
       alignItems="stretch"
@@ -58,27 +69,151 @@ export default function Layout({ children }) {
           minWidth: minW,
         }}
       >
-        <Typography sx={{ color: "#fff", fontWeight: 800, fontSize: dateSize, lineHeight: 1, fontFamily: "'DM Sans', sans-serif" }}>
+        <Typography
+          sx={{
+            color: "#fff",
+            fontWeight: 800,
+            fontSize: dateSize,
+            lineHeight: 1,
+            fontFamily: "'DM Sans', sans-serif",
+          }}
+        >
           {dayNum}
         </Typography>
-        <Typography sx={{ color: "rgba(255,255,255,0.50)", fontWeight: 600, fontSize: monthSize, letterSpacing: "0.10em", mt: "2px", fontFamily: "'DM Sans', sans-serif", textTransform: "uppercase" }}>
+        <Typography
+          sx={{
+            color: "rgba(255,255,255,0.50)",
+            fontWeight: 600,
+            fontSize: monthSize,
+            letterSpacing: "0.10em",
+            mt: "2px",
+            fontFamily: "'DM Sans', sans-serif",
+            textTransform: "uppercase",
+          }}
+        >
           {monthShort}
         </Typography>
       </Box>
-      <Box sx={{ px, py, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-        <Typography sx={{ color: "#fff", fontWeight: 700, fontSize: timeSize, lineHeight: 1, fontFamily: "'DM Mono', 'Courier New', monospace", letterSpacing: "0.04em", whiteSpace: "nowrap" }}>
+      <Box
+        sx={{
+          px,
+          py,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+        }}
+      >
+        <Typography
+          sx={{
+            color: "#fff",
+            fontWeight: 700,
+            fontSize: timeSize,
+            lineHeight: 1,
+            fontFamily: "'DM Mono', 'Courier New', monospace",
+            letterSpacing: "0.04em",
+            whiteSpace: "nowrap",
+          }}
+        >
           {showFull ? timeStr : timeStr.slice(0, 5)}
         </Typography>
-        <Typography sx={{ color: "rgba(255,255,255,0.40)", fontSize: subSize, mt: "3px", fontFamily: "'DM Sans', sans-serif", whiteSpace: "nowrap" }}>
+        <Typography
+          sx={{
+            color: "rgba(255,255,255,0.40)",
+            fontSize: subSize,
+            mt: "3px",
+            fontFamily: "'DM Sans', sans-serif",
+            whiteSpace: "nowrap",
+          }}
+        >
           {showFull ? dateStr : `${dayShort}, ${dateShort}`}
         </Typography>
       </Box>
     </Stack>
   );
 
+  const BackToPilarButton = ({
+    height,
+    px,
+    borderRadius,
+    fontSize,
+    iconSize,
+    showSubtext = false,
+  }) => (
+    <Stack
+      component="a"
+      href="https://pilargroup.id"
+      target="_blank"
+      rel="noopener noreferrer"
+      direction="row"
+      alignItems="center"
+      spacing={0.9}
+      sx={{
+        textDecoration: "none",
+        height,
+        px,
+        borderRadius,
+        background: "rgba(255,255,255,0.08)",
+        border: "1px solid rgba(255,255,255,0.18)",
+        transition: "all 0.2s ease",
+        "&:hover": {
+          background: "rgba(255,255,255,0.14)",
+          border: "1px solid rgba(255,255,255,0.28)",
+          transform: "translateY(-1px)",
+        },
+      }}
+    >
+      <Box
+        sx={{
+          width: iconSize + 10,
+          height: iconSize + 10,
+          borderRadius: "50%",
+          background: "rgba(255,255,255,0.12)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+        }}
+      >
+        <ArrowBackRoundedIcon sx={{ color: "#fff", fontSize: iconSize }} />
+      </Box>
+
+      <Box sx={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
+        <Typography
+          sx={{
+            color: "#fff",
+            fontWeight: 700,
+            fontSize,
+            fontFamily: "'DM Sans', sans-serif",
+            whiteSpace: "nowrap",
+            lineHeight: 1.1,
+          }}
+        >
+          Back to Pilar
+        </Typography>
+
+        {showSubtext && (
+          <Typography
+            sx={{
+              color: "rgba(255,255,255,0.45)",
+              fontWeight: 600,
+              fontSize: "9px",
+              letterSpacing: "0.08em",
+              fontFamily: "'DM Sans', sans-serif",
+              whiteSpace: "nowrap",
+              mt: "2px",
+              textTransform: "uppercase",
+              lineHeight: 1,
+            }}
+          >
+            pilargroup.id
+          </Typography>
+        )}
+      </Box>
+    </Stack>
+  );
+
   return (
     <Box sx={{ width: "100%" }}>
-      {/* position sticky + top 0 + zIndex supaya stay saat scroll */}
       <AppBar
         position="sticky"
         elevation={0}
@@ -102,8 +237,14 @@ export default function Layout({ children }) {
             justifyContent: "space-between",
           }}
         >
-          {/* ── LEFT — logo.svg ── */}
-          <Box sx={{ display: "flex", alignItems: "center", flexShrink: 0, zIndex: 1 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              flexShrink: 0,
+              zIndex: 1,
+            }}
+          >
             <Box
               component="img"
               src="/logo.svg"
@@ -118,7 +259,6 @@ export default function Layout({ children }) {
             />
           </Box>
 
-          {/* ── CENTER — sm ke atas ── */}
           <Stack
             direction="row"
             alignItems="center"
@@ -145,7 +285,9 @@ export default function Layout({ children }) {
                 flexShrink: 0,
               }}
             >
-              <ReceiptLongRoundedIcon sx={{ color: "#fff", fontSize: { sm: 16, md: 18 } }} />
+              <ReceiptLongRoundedIcon
+                sx={{ color: "#fff", fontSize: { sm: 16, md: 18 } }}
+              />
             </Box>
             <Box>
               <Typography
@@ -177,89 +319,61 @@ export default function Layout({ children }) {
             </Box>
           </Stack>
 
-          {/* ── RIGHT ── */}
           <Stack
             direction="row"
             alignItems="center"
             spacing={1}
             sx={{ flexShrink: 0, zIndex: 1 }}
           >
-            {/* Kalender desktop */}
             <Box sx={{ display: { xs: "none", md: "block" } }}>
               <CalendarPill
-                dateSize="20px" monthSize="9px" timeSize="15px" subSize="11px"
-                px="13px" py="8px" minW="46px" borderRadius="12px" showFull
+                dateSize="20px"
+                monthSize="9px"
+                timeSize="15px"
+                subSize="11px"
+                px="13px"
+                py="8px"
+                minW="46px"
+                borderRadius="12px"
+                showFull
               />
             </Box>
 
-            {/* Kalender tablet */}
             <Box sx={{ display: { xs: "none", sm: "block", md: "none" } }}>
               <CalendarPill
-                dateSize="17px" monthSize="8px" timeSize="13px" subSize="10px"
-                px="11px" py="7px" minW="40px" borderRadius="10px" showFull={false}
+                dateSize="17px"
+                monthSize="8px"
+                timeSize="13px"
+                subSize="10px"
+                px="11px"
+                py="7px"
+                minW="40px"
+                borderRadius="10px"
+                showFull={false}
               />
             </Box>
 
-            {/* Kalender mobile */}
             <Box sx={{ display: { xs: "block", sm: "none" } }}>
-              <CalendarPill
-                dateSize="16px" monthSize="8px" timeSize="13px" subSize="9px"
-                px="10px" py="7px" minW="36px" borderRadius="10px" showFull={false}
+              <BackToPilarButton
+                height="38px"
+                px="12px"
+                borderRadius="10px"
+                fontSize="12px"
+                iconSize={16}
+                showSubtext={false}
               />
             </Box>
 
-            {/* Chip — tinggi sama dengan kalender pill */}
-            <Stack
-              direction="row"
-              alignItems="center"
-              spacing={0.75}
-              sx={{
-                display: { xs: "none", sm: "flex" },
-                height: { sm: "36px", md: "40px" },
-                px: { sm: "12px", md: "14px" },
-                borderRadius: "10px",
-                background: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.18)",
-              }}
-            >
-              {/* pulse dot */}
-              <Box sx={{ position: "relative", width: 7, height: 7, flexShrink: 0 }}>
-                <Box
-                  sx={{
-                    position: "absolute",
-                    inset: 0,
-                    borderRadius: "50%",
-                    background: "rgba(255,255,255,0.55)",
-                    animation: "ping 1.4s ease-out infinite",
-                    "@keyframes ping": {
-                      "0%": { transform: "scale(1)", opacity: 0.75 },
-                      "100%": { transform: "scale(2.6)", opacity: 0 },
-                    },
-                  }}
-                />
-                <Box
-                  sx={{
-                    position: "absolute",
-                    inset: 0,
-                    borderRadius: "50%",
-                    background: "#fff",
-                  }}
-                />
-              </Box>
-              <Typography
-                sx={{
-                  color: "rgba(255,255,255,0.85)",
-                  fontWeight: 600,
-                  fontSize: { sm: "10px", md: "11px" },
-                  letterSpacing: "0.06em",
-                  fontFamily: "'DM Sans', sans-serif",
-                  whiteSpace: "nowrap",
-                  lineHeight: 1,
-                }}
-              >
-                Siap Digunakan
-              </Typography>
-            </Stack>
+            <Box sx={{ display: { xs: "none", sm: "block" } }}>
+              <BackToPilarButton
+                height={{ sm: "36px", md: "40px" }}
+                px={{ sm: "12px", md: "14px" }}
+                borderRadius="10px"
+                fontSize={{ sm: "10px", md: "11px" }}
+                iconSize={16}
+                showSubtext={false}
+              />
+            </Box>
           </Stack>
         </Toolbar>
       </AppBar>
