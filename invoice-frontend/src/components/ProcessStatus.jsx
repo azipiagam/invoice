@@ -1,18 +1,11 @@
-import {
-  Box,
-  Chip,
-  Paper,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Box, Chip, Paper, Stack, Typography } from "@mui/material";
 import AutorenewRoundedIcon from "@mui/icons-material/AutorenewRounded";
 import HourglassEmptyRoundedIcon from "@mui/icons-material/HourglassEmptyRounded";
 import DescriptionRoundedIcon from "@mui/icons-material/DescriptionRounded";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import ErrorOutlineRoundedIcon from "@mui/icons-material/ErrorOutlineRounded";
 
-// ── Decorative SVG background ──────────────────────────────────────────────
-function BgDecor({ accentColor }) {
+function BgDecor({ accentColor, isDone, isFailed }) {
   return (
     <Box
       sx={{
@@ -20,117 +13,112 @@ function BgDecor({ accentColor }) {
         inset: 0,
         pointerEvents: "none",
         overflow: "hidden",
-        borderRadius: "24px",
+        borderRadius: "26px",
         zIndex: 0,
       }}
     >
       <svg
         width="100%"
         height="100%"
-        viewBox="0 0 680 220"
-        preserveAspectRatio="xMaxYMid slice"
+        viewBox="0 0 720 240"
+        preserveAspectRatio="xMidYMid slice"
         xmlns="http://www.w3.org/2000/svg"
         style={{ position: "absolute", inset: 0 }}
       >
-        {/* Large faint invoice icon — top right */}
-        <g opacity="0.055" transform="translate(530, -28) rotate(15)">
-          <rect x="0" y="0" width="110" height="140" rx="12" fill={accentColor} />
-          <rect x="14" y="30" width="82" height="8" rx="4" fill="white" />
-          <rect x="14" y="48" width="60" height="6" rx="3" fill="white" />
-          <rect x="14" y="62" width="70" height="6" rx="3" fill="white" />
-          <rect x="14" y="76" width="50" height="6" rx="3" fill="white" />
-          <rect x="14" y="98" width="82" height="1.5" rx="1" fill="white" opacity="0.5" />
-          <rect x="14" y="110" width="40" height="7" rx="3" fill="white" />
-          <rect x="68" y="108" width="28" height="9" rx="4" fill="white" />
-        </g>
+        <defs>
+          <linearGradient id="statusWave" x1="0%" x2="100%" y1="0%" y2="0%">
+            <stop offset="0%" stopColor={accentColor} stopOpacity="0" />
+            <stop offset="45%" stopColor={accentColor} stopOpacity="0.40" />
+            <stop offset="100%" stopColor={accentColor} stopOpacity="0" />
+          </linearGradient>
+        </defs>
 
-        {/* Medium faint chart icon — bottom left */}
-        <g opacity="0.05" transform="translate(-18, 90)">
-          <rect x="0" y="0" width="120" height="100" rx="14" fill={accentColor} />
-          <rect x="12" y="60" width="14" height="26" rx="4" fill="white" />
-          <rect x="32" y="42" width="14" height="44" rx="4" fill="white" />
-          <rect x="52" y="28" width="14" height="58" rx="4" fill="white" />
-          <rect x="72" y="48" width="14" height="38" rx="4" fill="white" />
-          <rect x="92" y="36" width="14" height="50" rx="4" fill="white" />
-        </g>
+        <path
+          d="M-20 175C102 112 183 102 286 116C392 129 468 185 570 173C626 166 674 140 742 98"
+          stroke="url(#statusWave)"
+          strokeWidth="1.4"
+          fill="none"
+        />
+        <path
+          d="M-5 210C118 178 199 149 298 154C397 160 489 218 602 206C652 201 701 182 750 160"
+          stroke="url(#statusWave)"
+          strokeWidth="1"
+          fill="none"
+          opacity="0.76"
+        />
 
-        {/* Small faint checkmark circle — mid right */}
-        <g opacity="0.06" transform="translate(610, 110)">
-          <circle cx="30" cy="30" r="30" fill={accentColor} />
-          <polyline
-            points="14,30 24,42 46,18"
-            stroke="white"
-            strokeWidth="5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="none"
-          />
-        </g>
-
-        {/* Tiny faint PDF icon — top left corner */}
-        <g opacity="0.045" transform="translate(8, 8) rotate(-8)">
-          <rect x="0" y="0" width="52" height="64" rx="8" fill={accentColor} />
-          <polygon points="34,0 52,18 34,18" fill="white" opacity="0.5" />
-          <rect x="8" y="26" width="36" height="5" rx="2.5" fill="white" />
-          <rect x="8" y="36" width="28" height="5" rx="2.5" fill="white" />
-          <rect x="8" y="46" width="20" height="5" rx="2.5" fill="white" />
-        </g>
-
-        {/* Dotted circle decoration — center right */}
         <circle
           cx="580"
-          cy="50"
-          r="44"
+          cy="56"
+          r="52"
           fill="none"
           stroke={accentColor}
-          strokeWidth="1.2"
-          strokeDasharray="4 6"
-          opacity="0.12"
+          strokeWidth="1.1"
+          strokeDasharray="4 8"
+          opacity="0.16"
         />
         <circle
           cx="580"
-          cy="50"
-          r="28"
+          cy="56"
+          r="30"
           fill="none"
           stroke={accentColor}
-          strokeWidth="0.8"
-          strokeDasharray="3 5"
-          opacity="0.08"
+          strokeWidth="0.9"
+          strokeDasharray="3 6"
+          opacity="0.11"
         />
 
-        {/* Subtle horizontal lines decoration */}
-        <line x1="160" y1="185" x2="340" y2="185" stroke={accentColor} strokeWidth="0.8" opacity="0.1" />
-        <line x1="170" y1="193" x2="300" y2="193" stroke={accentColor} strokeWidth="0.8" opacity="0.07" />
+        <rect x="72" y="34" width="102" height="74" rx="20" fill={accentColor} opacity="0.075" />
+        <rect x="98" y="57" width="50" height="8" rx="4" fill="white" opacity="0.76" />
+        <rect x="98" y="74" width="34" height="6" rx="3" fill="white" opacity="0.54" />
+
+        <rect x="524" y="142" width="112" height="78" rx="20" fill={accentColor} opacity="0.075" />
+        <rect x="547" y="165" width="16" height="32" rx="8" fill="white" opacity="0.54" />
+        <rect x="573" y="154" width="16" height="43" rx="8" fill="white" opacity="0.70" />
+        <rect x="599" y="146" width="16" height="51" rx="8" fill="white" opacity="0.84" />
+
+        <line x1="186" y1="198" x2="416" y2="198" stroke={accentColor} strokeWidth="0.8" opacity="0.12" />
+        <line x1="208" y1="208" x2="372" y2="208" stroke={accentColor} strokeWidth="0.8" opacity="0.08" />
       </svg>
 
-      {/* Soft gradient washes */}
       <Box
         sx={{
           position: "absolute",
-          top: -60,
-          right: -60,
-          width: 260,
-          height: 260,
+          top: -90,
+          right: -70,
+          width: 280,
+          height: 280,
           borderRadius: "50%",
-          background: `radial-gradient(circle, ${accentColor}18 0%, transparent 70%)`,
+          background: `radial-gradient(circle, ${accentColor}${isFailed ? "18" : "16"} 0%, transparent 72%)`,
+          animation: "orb-drift 12s ease-in-out infinite",
         }}
       />
       <Box
         sx={{
           position: "absolute",
-          bottom: -40,
-          left: -40,
-          width: 200,
-          height: 200,
+          left: -80,
+          bottom: -100,
+          width: 240,
+          height: 240,
           borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(14,165,233,0.08) 0%, transparent 70%)",
+          background: `radial-gradient(circle, ${
+            isDone ? "#10B98112" : "#23397114"
+          } 0%, transparent 72%)`,
+          animation: "orb-drift 14s ease-in-out infinite reverse",
+        }}
+      />
+      <Box
+        sx={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "linear-gradient(125deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 42%)",
         }}
       />
     </Box>
   );
 }
 
-// ── Main component ─────────────────────────────────────────────────────────
 export default function ProcessStatus({
   isProcessing = false,
   progress = 0,
@@ -152,10 +140,10 @@ export default function ProcessStatus({
   const chipLabel = isFailed
     ? "Gagal"
     : isDone
-    ? "Selesai"
-    : isRunning
-    ? "Sedang Diproses"
-    : "Menunggu Proses";
+      ? "Selesai"
+      : isRunning
+        ? "Sedang Diproses"
+        : "Menunggu Proses";
 
   const detailText = isFailed
     ? error || statusText || "Terjadi kesalahan saat proses generate invoice"
@@ -163,44 +151,43 @@ export default function ProcessStatus({
 
   const stepProgressValue = isFailed ? 0 : normalizedProgress;
 
-  // ── color tokens ──
-  const accentColor = isFailed ? "#EF4444" : isDone ? "#10B981" : "#6366F1";
+  const accentColor = isFailed ? "#EF4444" : isDone ? "#10B981" : "#233971";
   const accentLight = isFailed
     ? "rgba(239,68,68,0.10)"
     : isDone
-    ? "rgba(16,185,129,0.10)"
-    : "rgba(99,102,241,0.10)";
+      ? "rgba(16,185,129,0.10)"
+      : "rgba(35,57,113,0.10)";
   const accentBorder = isFailed
     ? "rgba(239,68,68,0.22)"
     : isDone
-    ? "rgba(16,185,129,0.22)"
-    : "rgba(99,102,241,0.22)";
+      ? "rgba(16,185,129,0.22)"
+      : "rgba(35,57,113,0.20)";
   const accentGrad = isFailed
     ? "linear-gradient(135deg, #EF4444, #F87171)"
     : isDone
-    ? "linear-gradient(135deg, #10B981, #34D399)"
-    : "linear-gradient(135deg, #6366F1, #818CF8)";
+      ? "linear-gradient(135deg, #10B981, #34D399)"
+      : "linear-gradient(135deg, #233971, #35529A)";
   const barGrad = isFailed
     ? "linear-gradient(90deg, #EF4444, #F87171)"
     : isDone
-    ? "linear-gradient(90deg, #10B981, #34D399)"
-    : "linear-gradient(90deg, #6366F1, #818CF8, #38BDF8)";
+      ? "linear-gradient(90deg, #10B981, #34D399)"
+      : "linear-gradient(90deg, #233971, #2F4B8F, #4468B3)";
 
   return (
     <Paper
       elevation={0}
       sx={{
-        borderRadius: "24px",
+        borderRadius: "26px",
         overflow: "hidden",
         position: "relative",
-        background: "linear-gradient(145deg, #ffffff 0%, #F8FAFF 55%, #F0F7FF 100%)",
+        background:
+          "linear-gradient(145deg, rgba(246,249,255,0.98) 0%, rgba(236,242,255,0.98) 55%, rgba(223,232,252,0.98) 100%)",
         boxShadow: `
           0 0 0 1px ${accentBorder},
-          0 4px 6px -1px rgba(0,0,0,0.04),
-          0 20px 48px -8px rgba(99,102,241,0.12)
+          0 10px 26px rgba(35,57,113,0.10),
+          0 24px 54px rgba(35,57,113,0.12)
         `,
         transition: "box-shadow 0.5s ease",
-
         "@keyframes spin": {
           from: { transform: "rotate(0deg)" },
           to: { transform: "rotate(360deg)" },
@@ -219,14 +206,12 @@ export default function ProcessStatus({
         },
         "@keyframes orb-drift": {
           "0%, 100%": { transform: "translate(0,0)" },
-          "50%": { transform: "translate(-10px, -14px)" },
+          "50%": { transform: "translate(-12px, -12px)" },
         },
       }}
     >
-      {/* Decorative background */}
-      <BgDecor accentColor={accentColor} />
+      <BgDecor accentColor={accentColor} isDone={isDone} isFailed={isFailed} />
 
-      {/* Top accent stripe */}
       <Box
         sx={{
           height: "3px",
@@ -245,7 +230,6 @@ export default function ProcessStatus({
           zIndex: 2,
         }}
       >
-        {/* ── Header row ── */}
         <Stack
           direction={{ xs: "column", sm: "row" }}
           justifyContent="space-between"
@@ -270,7 +254,7 @@ export default function ProcessStatus({
                 mt: 0.35,
                 fontFamily: "'DM Sans', sans-serif",
                 fontSize: "0.81rem",
-                color: "#64748B",
+                color: "#5F6F89",
               }}
             >
               Pantau status upload dan generate invoice secara realtime.
@@ -297,7 +281,7 @@ export default function ProcessStatus({
                 />
               ) : (
                 <HourglassEmptyRoundedIcon
-                  sx={{ fontSize: "15px !important", color: "#94A3B8 !important" }}
+                  sx={{ fontSize: "15px !important", color: "#7D8CA5 !important" }}
                 />
               )
             }
@@ -308,47 +292,44 @@ export default function ProcessStatus({
               fontSize: "0.72rem",
               letterSpacing: "0.03em",
               height: 30,
-              borderRadius: "9px",
+              borderRadius: "999px",
               background: accentLight,
               border: `1px solid ${accentBorder}`,
               color: accentColor,
-              transition: "all 0.4s ease",
             }}
           />
         </Stack>
 
-        {/* ── File card ── */}
         <Box
           sx={{
-            borderRadius: "16px",
-            p: "13px 17px",
+            borderRadius: "18px",
+            p: "14px 17px",
             animation: "fade-up 0.45s ease 0.07s both",
-            background: "rgba(255,255,255,0.72)",
-            backdropFilter: "blur(12px)",
+            background: "rgba(255,255,255,0.76)",
+            backdropFilter: "blur(14px)",
             border: isRunning
               ? `1px solid ${accentBorder}`
               : isFailed
-              ? "1px solid rgba(239,68,68,0.2)"
-              : "1px solid rgba(226,232,240,0.9)",
+                ? "1px solid rgba(239,68,68,0.2)"
+                : "1px solid rgba(188,202,232,0.78)",
             boxShadow: isRunning
-              ? `0 0 0 3px ${accentLight}`
-              : "0 1px 4px rgba(0,0,0,0.05)",
+              ? `0 0 0 4px ${accentLight}`
+              : "0 6px 18px rgba(15,23,42,0.05)",
             transition: "border-color 0.3s, box-shadow 0.3s",
           }}
         >
           <Stack direction="row" spacing={1.5} alignItems="center">
             <Box
               sx={{
-                width: 40,
-                height: 40,
-                borderRadius: "12px",
+                width: 42,
+                height: 42,
+                borderRadius: "14px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 flexShrink: 0,
                 background: selectedFile ? accentGrad : "linear-gradient(135deg,#E2E8F0,#CBD5E1)",
-                boxShadow: selectedFile ? `0 6px 16px ${accentLight}` : "none",
-                transition: "all 0.4s ease",
+                boxShadow: selectedFile ? `0 10px 20px ${accentLight}` : "none",
               }}
             >
               <DescriptionRoundedIcon sx={{ fontSize: 20, color: "#fff" }} />
@@ -377,7 +358,6 @@ export default function ProcessStatus({
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
-                  transition: "color 0.3s",
                 }}
               >
                 {detailText}
@@ -389,7 +369,7 @@ export default function ProcessStatus({
                 sx={{
                   px: 1.3,
                   py: 0.45,
-                  borderRadius: "7px",
+                  borderRadius: "999px",
                   background: accentLight,
                   border: `1px solid ${accentBorder}`,
                   flexShrink: 0,
@@ -411,41 +391,43 @@ export default function ProcessStatus({
           </Stack>
         </Box>
 
-        {/* ── Info proses realtime ── */}
         {(isRunning || isDone || isFailed) && (
           <Stack
             direction={{ xs: "column", md: "row" }}
             spacing={1.25}
             sx={{ animation: "fade-up 0.45s ease 0.12s both" }}
           >
-            {/* Invoice saat ini */}
             <Box
               sx={{
                 flex: 1,
-                borderRadius: "14px",
-                p: "13px 15px",
-                background: "rgba(255,255,255,0.68)",
+                borderRadius: "16px",
+                p: "14px 15px",
+                background: "rgba(255,255,255,0.72)",
                 backdropFilter: "blur(10px)",
-                border: "1px solid rgba(226,232,240,0.85)",
+                border: "1px solid rgba(188,202,232,0.68)",
                 boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
                 position: "relative",
                 overflow: "hidden",
-                "&::after": isRunning && !isFailed ? {
-                  content: '""',
-                  position: "absolute",
-                  bottom: 0, left: 0, right: 0,
-                  height: "2px",
-                  background: barGrad,
-                  animation: "shimmer 2.2s ease-in-out infinite",
-                } : {},
+                "&::after": isRunning && !isFailed
+                  ? {
+                      content: '""',
+                      position: "absolute",
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      height: "2px",
+                      background: barGrad,
+                      animation: "shimmer 2.2s ease-in-out infinite",
+                    }
+                  : {},
               }}
             >
               <Typography
                 sx={{
                   fontFamily: "'DM Sans', sans-serif",
                   fontSize: "0.67rem",
-                  fontWeight: 600,
-                  color: "#94A3B8",
+                  fontWeight: 700,
+                  color: "#8A99B2",
                   letterSpacing: "0.09em",
                   textTransform: "uppercase",
                   mb: 0.5,
@@ -460,22 +442,20 @@ export default function ProcessStatus({
                   fontSize: "0.88rem",
                   color: accentColor,
                   wordBreak: "break-word",
-                  transition: "color 0.3s",
                 }}
               >
-                {currentInvoice || (isDone ? "Semua invoice selesai ✓" : "—")}
+                {currentInvoice || (isDone ? "Semua invoice selesai" : "-")}
               </Typography>
             </Box>
 
-            {/* Counter */}
             <Box
               sx={{
                 minWidth: { xs: "100%", md: 165 },
-                borderRadius: "14px",
-                p: "13px 15px",
-                background: "rgba(255,255,255,0.68)",
+                borderRadius: "16px",
+                p: "14px 15px",
+                background: "rgba(255,255,255,0.72)",
                 backdropFilter: "blur(10px)",
-                border: "1px solid rgba(226,232,240,0.85)",
+                border: "1px solid rgba(188,202,232,0.68)",
                 boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
               }}
             >
@@ -483,8 +463,8 @@ export default function ProcessStatus({
                 sx={{
                   fontFamily: "'DM Sans', sans-serif",
                   fontSize: "0.67rem",
-                  fontWeight: 600,
-                  color: "#94A3B8",
+                  fontWeight: 700,
+                  color: "#8A99B2",
                   letterSpacing: "0.09em",
                   textTransform: "uppercase",
                   mb: 0.5,
@@ -500,10 +480,9 @@ export default function ProcessStatus({
                     fontSize: "1.5rem",
                     lineHeight: 1,
                     color: accentColor,
-                    transition: "color 0.3s",
                   }}
                 >
-                  {total > 0 ? current : "—"}
+                  {total > 0 ? current : "-"}
                 </Typography>
                 {total > 0 && (
                   <Typography
@@ -522,14 +501,8 @@ export default function ProcessStatus({
           </Stack>
         )}
 
-        {/* ── Progress section ── */}
         <Box sx={{ animation: "fade-up 0.45s ease 0.17s both" }}>
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-            sx={{ mb: 1.2 }}
-          >
+          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.2 }}>
             <Stack direction="row" spacing={0.75} alignItems="center">
               <Typography
                 sx={{
@@ -563,7 +536,6 @@ export default function ProcessStatus({
                   fontSize: "1.35rem",
                   lineHeight: 1,
                   color: accentColor,
-                  transition: "color 0.4s",
                 }}
               >
                 {normalizedProgress}
@@ -582,39 +554,42 @@ export default function ProcessStatus({
             </Stack>
           </Stack>
 
-          {/* Progress bar */}
           <Box
             sx={{
               position: "relative",
-              height: 9,
+              height: 10,
               borderRadius: 999,
-              background: "rgba(14,60,110,0.07)",
+              background: "rgba(35,57,113,0.08)",
               overflow: "hidden",
             }}
           >
             <Box
               sx={{
                 position: "absolute",
-                top: 0, left: 0,
+                top: 0,
+                left: 0,
                 height: "100%",
                 width: `${normalizedProgress}%`,
                 borderRadius: 999,
                 background: barGrad,
                 transition: "width 0.5s cubic-bezier(0.4,0,0.2,1), background 0.5s ease",
-                "&::after": isRunning && !isFailed ? {
-                  content: '""',
-                  position: "absolute",
-                  top: 0, left: "-65%",
-                  width: "55%",
-                  height: "100%",
-                  background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent)",
-                  animation: "shimmer 1.8s ease-in-out infinite",
-                } : {},
+                "&::after": isRunning && !isFailed
+                  ? {
+                      content: '""',
+                      position: "absolute",
+                      top: 0,
+                      left: "-65%",
+                      width: "55%",
+                      height: "100%",
+                      background:
+                        "linear-gradient(90deg, transparent, rgba(255,255,255,0.50), transparent)",
+                      animation: "shimmer 1.8s ease-in-out infinite",
+                    }
+                  : {},
               }}
             />
           </Box>
 
-          {/* Step indicators */}
           <Stack direction="row" justifyContent="space-between" sx={{ mt: 1.2 }}>
             {["Upload", "Validasi", "Generate", "Selesai"].map((step, i) => {
               const stepThreshold = (i + 1) * 25;
@@ -626,10 +601,10 @@ export default function ProcessStatus({
                 <Stack key={step} alignItems="center" spacing={0.4}>
                   <Box
                     sx={{
-                      width: 6,
-                      height: 6,
+                      width: 7,
+                      height: 7,
                       borderRadius: "50%",
-                      bgcolor: active ? accentColor : "rgba(14,60,110,0.13)",
+                      bgcolor: active ? accentColor : "rgba(35,57,113,0.12)",
                       transition: "all 0.35s ease",
                       transform: isCurrent && isRunning ? "scale(1.5)" : "scale(1)",
                       boxShadow: active
@@ -643,7 +618,7 @@ export default function ProcessStatus({
                     sx={{
                       fontFamily: "'DM Sans', sans-serif",
                       fontSize: "0.61rem",
-                      fontWeight: active ? 700 : 400,
+                      fontWeight: active ? 700 : 500,
                       color: active ? accentColor : "#94A3B8",
                       transition: "all 0.35s ease",
                     }}
@@ -656,11 +631,10 @@ export default function ProcessStatus({
           </Stack>
         </Box>
 
-        {/* ── Error box ── */}
         {isFailed && (
           <Box
             sx={{
-              borderRadius: "13px",
+              borderRadius: "14px",
               p: "13px 17px",
               background: "rgba(239,68,68,0.06)",
               border: "1px solid rgba(239,68,68,0.2)",

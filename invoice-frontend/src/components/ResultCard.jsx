@@ -42,28 +42,28 @@ function BgDecor() {
         xmlns="http://www.w3.org/2000/svg"
         style={{ position: "absolute", inset: 0 }}
       >
-        <g opacity="0.052" transform="translate(580, -20) rotate(14)">
+        <g opacity="0.082" transform="translate(580, -20) rotate(14)">
           <rect x="0" y="0" width="108" height="138" rx="11" fill="#10B981" />
-          <polygon points="72,0 108,36 72,36" fill="white" opacity="0.45" />
+          <polygon points="72,0 108,36 72,36" fill="white" opacity="0.58" />
           <rect x="13" y="48" width="82" height="7" rx="3.5" fill="white" />
-          <rect x="13" y="62" width="60" height="5.5" rx="2.5" fill="white" />
-          <rect x="13" y="74" width="70" height="5.5" rx="2.5" fill="white" />
-          <rect x="13" y="86" width="50" height="5.5" rx="2.5" fill="white" />
-          <rect x="13" y="104" width="82" height="1.2" rx="1" fill="white" opacity="0.4" />
+          <rect x="13" y="62" width="60" height="5.5" rx="2.5" fill="white" opacity="0.90" />
+          <rect x="13" y="74" width="70" height="5.5" rx="2.5" fill="white" opacity="0.84" />
+          <rect x="13" y="86" width="50" height="5.5" rx="2.5" fill="white" opacity="0.78" />
+          <rect x="13" y="104" width="82" height="1.2" rx="1" fill="white" opacity="0.54" />
           <rect x="13" y="114" width="38" height="7" rx="3" fill="white" />
           <rect x="65" y="112" width="30" height="9" rx="4" fill="white" />
         </g>
 
-        <g opacity="0.048" transform="translate(-16, 145)">
+        <g opacity="0.076" transform="translate(-16, 145)">
           <rect x="0" y="0" width="118" height="96" rx="13" fill="#10B981" />
-          <rect x="12" y="58" width="13" height="24" rx="4" fill="white" />
-          <rect x="31" y="40" width="13" height="42" rx="4" fill="white" />
-          <rect x="50" y="26" width="13" height="56" rx="4" fill="white" />
-          <rect x="69" y="44" width="13" height="38" rx="4" fill="white" />
-          <rect x="88" y="32" width="13" height="50" rx="4" fill="white" />
+          <rect x="12" y="58" width="13" height="24" rx="4" fill="white" opacity="0.86" />
+          <rect x="31" y="40" width="13" height="42" rx="4" fill="white" opacity="0.86" />
+          <rect x="50" y="26" width="13" height="56" rx="4" fill="white" opacity="0.86" />
+          <rect x="69" y="44" width="13" height="38" rx="4" fill="white" opacity="0.86" />
+          <rect x="88" y="32" width="13" height="50" rx="4" fill="white" opacity="0.86" />
         </g>
 
-        <g opacity="0.055" transform="translate(648, 95)">
+        <g opacity="0.084" transform="translate(648, 95)">
           <circle cx="32" cy="32" r="32" fill="#10B981" />
           <polyline
             points="14,32 25,44 50,18"
@@ -75,20 +75,20 @@ function BgDecor() {
           />
         </g>
 
-        <g opacity="0.042" transform="translate(10, 10) rotate(-7)">
+        <g opacity="0.072" transform="translate(10, 10) rotate(-7)">
           <rect x="0" y="0" width="50" height="62" rx="8" fill="#10B981" />
-          <polygon points="32,0 50,18 32,18" fill="white" opacity="0.5" />
-          <rect x="7" y="26" width="36" height="4.5" rx="2" fill="white" />
-          <rect x="7" y="35" width="28" height="4.5" rx="2" fill="white" />
-          <rect x="7" y="44" width="20" height="4.5" rx="2" fill="white" />
+          <polygon points="32,0 50,18 32,18" fill="white" opacity="0.60" />
+          <rect x="7" y="26" width="36" height="4.5" rx="2" fill="white" opacity="0.92" />
+          <rect x="7" y="35" width="28" height="4.5" rx="2" fill="white" opacity="0.82" />
+          <rect x="7" y="44" width="20" height="4.5" rx="2" fill="white" opacity="0.72" />
         </g>
 
-        <g opacity="0.042" transform="translate(490, 185) rotate(8)">
+        <g opacity="0.074" transform="translate(490, 185) rotate(8)">
           <rect x="6" y="6" width="72" height="58" rx="9" fill="#0EA5E9" />
           <rect x="0" y="0" width="72" height="58" rx="9" fill="#10B981" />
-          <rect x="10" y="14" width="52" height="5" rx="2.5" fill="white" />
-          <rect x="10" y="25" width="38" height="5" rx="2.5" fill="white" />
-          <rect x="10" y="36" width="44" height="5" rx="2.5" fill="white" />
+          <rect x="10" y="14" width="52" height="5" rx="2.5" fill="white" opacity="0.92" />
+          <rect x="10" y="25" width="38" height="5" rx="2.5" fill="white" opacity="0.82" />
+          <rect x="10" y="36" width="44" height="5" rx="2.5" fill="white" opacity="0.72" />
         </g>
 
         <circle
@@ -99,7 +99,7 @@ function BgDecor() {
           stroke="#10B981"
           strokeWidth="1.2"
           strokeDasharray="4 7"
-          opacity="0.10"
+          opacity="0.14"
         />
 
         <circle
@@ -110,11 +110,11 @@ function BgDecor() {
           stroke="#10B981"
           strokeWidth="0.9"
           strokeDasharray="3 6"
-          opacity="0.08"
+          opacity="0.11"
         />
 
-        <line x1="190" y1="228" x2="420" y2="228" stroke="#10B981" strokeWidth="0.8" opacity="0.09" />
-        <line x1="200" y1="237" x2="370" y2="237" stroke="#10B981" strokeWidth="0.7" opacity="0.06" />
+        <line x1="190" y1="228" x2="420" y2="228" stroke="#10B981" strokeWidth="0.8" opacity="0.12" />
+        <line x1="200" y1="237" x2="370" y2="237" stroke="#10B981" strokeWidth="0.7" opacity="0.08" />
       </svg>
 
       <Box
@@ -125,7 +125,7 @@ function BgDecor() {
           width: 280,
           height: 280,
           borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(16,185,129,0.11) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(16,185,129,0.14) 0%, transparent 70%)",
         }}
       />
       <Box
@@ -136,7 +136,7 @@ function BgDecor() {
           width: 220,
           height: 220,
           borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(14,165,233,0.08) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(14,165,233,0.10) 0%, transparent 70%)",
         }}
       />
     </Box>
@@ -145,24 +145,54 @@ function BgDecor() {
 
 const bgIcons = [
   {
-    icon: <PictureAsPdfRoundedIcon sx={{ fontSize: 28, color: "rgba(220,38,38,0.18)" }} />,
-    top: 88, right: 118, size: 52, rotate: "-10deg", delay: "0s",
+    icon: <PictureAsPdfRoundedIcon sx={{ fontSize: 28, color: "rgba(220,38,38,0.34)" }} />,
+    top: 88,
+    right: 118,
+    size: 52,
+    rotate: "-10deg",
+    delay: "0s",
+    bg: "rgba(255,255,255,0.76)",
+    border: "1px solid rgba(248,113,113,0.26)",
   },
   {
-    icon: <DownloadRoundedIcon sx={{ fontSize: 26, color: "rgba(16,185,129,0.15)" }} />,
-    top: 178, right: 36, size: 48, rotate: "8deg", delay: "0.6s",
+    icon: <DownloadRoundedIcon sx={{ fontSize: 26, color: "rgba(16,185,129,0.30)" }} />,
+    top: 178,
+    right: 36,
+    size: 48,
+    rotate: "8deg",
+    delay: "0.6s",
+    bg: "rgba(255,255,255,0.74)",
+    border: "1px solid rgba(16,185,129,0.22)",
   },
   {
-    icon: <FolderZipRoundedIcon sx={{ fontSize: 26, color: "rgba(14,165,233,0.13)" }} />,
-    bottom: 110, left: 40, size: 50, rotate: "-12deg", delay: "1.1s",
+    icon: <FolderZipRoundedIcon sx={{ fontSize: 26, color: "rgba(14,165,233,0.28)" }} />,
+    bottom: 110,
+    left: 40,
+    size: 50,
+    rotate: "-12deg",
+    delay: "1.1s",
+    bg: "rgba(255,255,255,0.74)",
+    border: "1px solid rgba(14,165,233,0.22)",
   },
   {
-    icon: <ReceiptLongRoundedIcon sx={{ fontSize: 28, color: "rgba(139,92,246,0.12)" }} />,
-    bottom: 44, right: 148, size: 54, rotate: "12deg", delay: "0.4s",
+    icon: <ReceiptLongRoundedIcon sx={{ fontSize: 28, color: "rgba(139,92,246,0.26)" }} />,
+    bottom: 44,
+    right: 148,
+    size: 54,
+    rotate: "12deg",
+    delay: "0.4s",
+    bg: "rgba(255,255,255,0.74)",
+    border: "1px solid rgba(139,92,246,0.20)",
   },
   {
-    icon: <InsertDriveFileRoundedIcon sx={{ fontSize: 22, color: "rgba(5,150,105,0.12)" }} />,
-    top: 50, left: 108, size: 44, rotate: "-8deg", delay: "0.9s",
+    icon: <InsertDriveFileRoundedIcon sx={{ fontSize: 22, color: "rgba(5,150,105,0.24)" }} />,
+    top: 50,
+    left: 108,
+    size: 44,
+    rotate: "-8deg",
+    delay: "0.9s",
+    bg: "rgba(255,255,255,0.74)",
+    border: "1px solid rgba(5,150,105,0.18)",
   },
 ];
 
@@ -206,6 +236,11 @@ export default function ResultCard({ result }) {
 
   const canPreview = isCompleted && !!previewUrl;
   const canDownload = isCompleted && !!downloadUrl;
+
+  const successMessage =
+    safeResult.message && safeResult.message.trim()
+      ? safeResult.message
+      : "Invoice premium berhasil dibuat dan siap diunduh.";
 
   const handleOpenPdf = () => {
     if (!canPreview) {
@@ -281,15 +316,15 @@ export default function ResultCard({ result }) {
             width: item.size,
             height: item.size,
             borderRadius: "15px",
-            background: "rgba(255,255,255,0.55)",
-            border: "1px solid rgba(255,255,255,0.8)",
+            background: item.bg,
+            border: item.border,
             backdropFilter: "blur(8px)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             "--rot": item.rotate,
             transform: `rotate(${item.rotate})`,
-            boxShadow: "0 4px 16px rgba(15,23,42,0.05), 0 1px 3px rgba(15,23,42,0.04)",
+            boxShadow: "0 6px 18px rgba(15,23,42,0.07), 0 1px 4px rgba(15,23,42,0.05)",
             pointerEvents: "none",
             zIndex: 1,
             animation: `float-soft ${4 + i * 0.55}s ease-in-out ${item.delay} infinite`,
@@ -315,10 +350,10 @@ export default function ResultCard({ result }) {
         <Stack
           direction="row"
           spacing={2}
-          alignItems="center"
+          alignItems="flex-start"
           sx={{ animation: "fade-up 0.45s ease both" }}
         >
-          <Box sx={{ position: "relative", flexShrink: 0 }}>
+          <Box sx={{ position: "relative", flexShrink: 0, mt: 0.2 }}>
             <Box
               sx={{
                 position: "absolute",
@@ -345,28 +380,44 @@ export default function ResultCard({ result }) {
             </Box>
           </Box>
 
-          <Box flex={1}>
-            <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap">
-              <Typography
+          <Box flex={1} minWidth={0}>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={1.2}
+              alignItems={{ xs: "flex-start", sm: "center" }}
+              flexWrap="wrap"
+            >
+              <Box
                 sx={{
-                  fontFamily: "'Sora', sans-serif",
-                  fontWeight: 900,
-                  fontSize: "1.18rem",
-                  background: "linear-gradient(135deg, #065F46, #10B981)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  letterSpacing: "-0.02em",
+                  px: 1.6,
+                  py: 0.75,
+                  borderRadius: "12px",
+                  background: "linear-gradient(135deg, #059669, #10B981)",
+                  border: "1px solid rgba(5,150,105,0.40)",
+                  boxShadow: "0 4px 14px rgba(16,185,129,0.28)",
                 }}
               >
-                {isCompleted ? "Generate Berhasil" : "Sedang Diproses"}
-              </Typography>
+                <Typography
+                  sx={{
+                    fontFamily: "'Sora', sans-serif",
+                    fontWeight: 900,
+                    fontSize: "1.08rem",
+                    color: "#ffffff",
+                    letterSpacing: "-0.02em",
+                    lineHeight: 1.2,
+                    textShadow: "0 1px 2px rgba(0,0,0,0.18)",
+                  }}
+                >
+                  {isCompleted ? "Generate Berhasil" : "Sedang Diproses"}
+                </Typography>
+              </Box>
 
               <Chip
                 label={`${totalInvoices} invoice`}
                 size="small"
                 sx={{
-                  background: "rgba(16,185,129,0.10)",
-                  border: "1px solid rgba(16,185,129,0.22)",
+                  background: "rgba(16,185,129,0.12)",
+                  border: "1px solid rgba(16,185,129,0.24)",
                   color: "#047857",
                   fontFamily: "'DM Sans', sans-serif",
                   fontWeight: 800,
@@ -375,17 +426,19 @@ export default function ResultCard({ result }) {
                 }}
               />
             </Stack>
+
             <Typography
               sx={{
-                mt: 0.5,
-                color: "#334155",
+                mt: 1,
+                color: "#0F172A",
                 fontFamily: "'DM Sans', sans-serif",
-                fontSize: "0.83rem",
-                fontWeight: 500,
-                lineHeight: 1.5,
+                fontSize: "0.92rem",
+                fontWeight: 700,
+                lineHeight: 1.6,
+                maxWidth: 760,
               }}
             >
-              {safeResult.message || "Invoice premium berhasil dibuat dan siap diunduh."}
+              {successMessage}
             </Typography>
           </Box>
         </Stack>
@@ -464,7 +517,12 @@ export default function ResultCard({ result }) {
           ))}
         </Grid>
 
-        <Divider sx={{ borderColor: "rgba(16,185,129,0.10)", animation: "fade-up 0.45s ease 0.16s both" }} />
+        <Divider
+          sx={{
+            borderColor: "rgba(16,185,129,0.10)",
+            animation: "fade-up 0.45s ease 0.16s both",
+          }}
+        />
 
         <Box sx={{ animation: "fade-up 0.45s ease 0.2s both" }}>
           <Stack
