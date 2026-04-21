@@ -206,6 +206,27 @@ def get_first_available_value(row, candidate_columns, default=None):
     return default
 
 
+def excel_col_to_index(col_letter):
+    """
+    Convert excel column letter to zero-based index.
+    A=0, B=1, ..., Z=25, AA=26, dst.
+    """
+    col_letter = str(col_letter).strip().upper()
+    result = 0
+    for ch in col_letter:
+        if not ("A" <= ch <= "Z"):
+            raise ValueError(f"Invalid excel column letter: {col_letter}")
+        result = result * 26 + (ord(ch) - ord("A") + 1)
+    return result - 1
+
+
+def get_column_by_excel_letter(df, col_letter):
+    idx = excel_col_to_index(col_letter)
+    if 0 <= idx < len(df.columns):
+        return df.columns[idx]
+    return None
+
+
 # =========================================================
 # FILE READER
 # =========================================================
@@ -425,7 +446,7 @@ def resolve_columns(df):
     """
     Mapping fleksibel untuk berbagai template Excel.
     """
-    return {
+    cols = {
         "order_no": find_column(
             df,
             [
@@ -580,7 +601,43 @@ def resolve_columns(df):
             ],
             required=False,
         ),
+        "summary_subtotal_product": None,
+        "detail_footer_subtotal": None,
     }
+
+    # =====================================================
+    # KHUSUS TEMPLATE YANG ADA KOLOM PAJAK
+    #
+    # Mapping:
+    # Q = Harga Satuan
+    # R = Subtotal per item/baris
+    # T = Subtotal Produk (summary kanan)
+    # U = Diskon
+    # Z = Total Pembayaran
+    #
+    # Permintaan terbaru:
+    # subtotal footer di tabel detail produk juga harus ambil dari Z
+    # =====================================================
+    if cols["tax"] is not None:
+        col_q = get_column_by_excel_letter(df, "Q")
+        col_r = get_column_by_excel_letter(df, "R")
+        col_t = get_column_by_excel_letter(df, "T")
+        col_u = get_column_by_excel_letter(df, "U")
+        col_z = get_column_by_excel_letter(df, "Z")
+
+        if col_q is not None:
+            cols["unit_price"] = col_q
+        if col_r is not None:
+            cols["line_subtotal"] = col_r
+        if col_t is not None:
+            cols["summary_subtotal_product"] = col_t
+        if col_u is not None:
+            cols["discount"] = col_u
+        if col_z is not None:
+            cols["total_payment"] = col_z
+            cols["detail_footer_subtotal"] = col_z
+
+    return cols
 
 
 # =========================================================
@@ -601,8 +658,15 @@ def build_invoice_story(order_df, order_no, invoice_no, styles, cols):
         get_first_available_value(row0, [cols["store_name"]], "-")
     )
 
+    # =====================================================
+    # SUMMARY KANAN: Subtotal Produk
+    # - non pajak: tetap pakai jumlah subtotal detail
+    # - pajak: pakai kolom T
+    # =====================================================
     grand_total = 0
-    if cols["line_subtotal"] and cols["line_subtotal"] in order_df.columns:
+    if cols["summary_subtotal_product"] and cols["summary_subtotal_product"] in row0.index:
+        grand_total = safe_num(row0.get(cols["summary_subtotal_product"], 0))
+    elif cols["line_subtotal"] and cols["line_subtotal"] in order_df.columns:
         grand_total = float(order_df[cols["line_subtotal"]].fillna(0).apply(safe_num).sum())
 
     shipping_est = safe_num(
@@ -614,8 +678,6 @@ def build_invoice_story(order_df, order_no, invoice_no, styles, cols):
 
     # =====================================================
     # PAJAK OPSIONAL
-    # Kalau kolom Pajak ada, jumlahkan per order
-    # Kalau tidak ada, pajak = 0 dan tidak tampil
     # =====================================================
     tax = 0
     if cols["tax"] and cols["tax"] in order_df.columns:
@@ -627,6 +689,15 @@ def build_invoice_story(order_df, order_no, invoice_no, styles, cols):
 
     if total_payment <= 0:
         total_payment = grand_total + shipping_est + tax - voucher
+
+    # =====================================================
+    # FOOTER SUBTOTAL DI TABEL DETAIL PRODUK
+    # - non pajak: tetap seperti lama = grand_total
+    # - pajak: ambil dari Z
+    # =====================================================
+    detail_footer_subtotal = grand_total
+    if cols["detail_footer_subtotal"] and cols["detail_footer_subtotal"] in row0.index:
+        detail_footer_subtotal = safe_num(row0.get(cols["detail_footer_subtotal"], grand_total))
 
     story = []
 
@@ -835,7 +906,7 @@ def build_invoice_story(order_df, order_no, invoice_no, styles, cols):
             Paragraph("", S["td"]),
             Paragraph("", S["td"]),
             Paragraph("Subtotal", S["td_bold_r"]),
-            Paragraph(fmt_rp(grand_total), S["td_bold_r"]),
+            Paragraph(fmt_rp(detail_footer_subtotal), S["td_bold_r"]),
         ]
     )
 
