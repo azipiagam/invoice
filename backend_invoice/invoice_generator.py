@@ -605,6 +605,11 @@ def resolve_columns(df):
         "detail_footer_subtotal": None,
     }
 
+    # langsung cek kolom excel Z untuk footer subtotal tabel detail
+    col_z = get_column_by_excel_letter(df, "Z")
+    if col_z is not None:
+        cols["detail_footer_subtotal"] = col_z
+
     # =====================================================
     # KHUSUS TEMPLATE YANG ADA KOLOM PAJAK
     #
@@ -614,9 +619,6 @@ def resolve_columns(df):
     # T = Subtotal Produk (summary kanan)
     # U = Diskon
     # Z = Total Pembayaran
-    #
-    # PERMINTAAN:
-    # footer subtotal tabel detail harus ambil Z, bukan T
     # =====================================================
     if cols["tax"] is not None:
         col_q = get_column_by_excel_letter(df, "Q")
@@ -692,8 +694,8 @@ def build_invoice_story(order_df, order_no, invoice_no, styles, cols):
 
     # =====================================================
     # FOOTER SUBTOTAL DI TABEL DETAIL PRODUK
-    # - non pajak: tetap seperti lama = grand_total
-    # - pajak: ambil dari Z
+    # - pakai kolom Z kalau ada
+    # - fallback ke grand_total kalau tidak ada
     # =====================================================
     detail_footer_subtotal = grand_total
     if cols["detail_footer_subtotal"] and cols["detail_footer_subtotal"] in row0.index:
