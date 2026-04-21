@@ -615,8 +615,8 @@ def resolve_columns(df):
     # U = Diskon
     # Z = Total Pembayaran
     #
-    # Permintaan terbaru:
-    # subtotal footer di tabel detail produk juga harus ambil dari Z
+    # PERMINTAAN:
+    # footer subtotal tabel detail harus ambil Z, bukan T
     # =====================================================
     if cols["tax"] is not None:
         col_q = get_column_by_excel_letter(df, "Q")
@@ -697,7 +697,9 @@ def build_invoice_story(order_df, order_no, invoice_no, styles, cols):
     # =====================================================
     detail_footer_subtotal = grand_total
     if cols["detail_footer_subtotal"] and cols["detail_footer_subtotal"] in row0.index:
-        detail_footer_subtotal = safe_num(row0.get(cols["detail_footer_subtotal"], grand_total))
+        detail_footer_subtotal = safe_num(
+            row0.get(cols["detail_footer_subtotal"], grand_total)
+        )
 
     story = []
 
