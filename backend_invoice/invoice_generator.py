@@ -605,15 +605,23 @@ def resolve_columns(df):
         "detail_footer_subtotal": None,
     }
 
-    col_z = get_column_by_excel_letter(df, "Z")
-    if col_z is not None:
-        cols["detail_footer_subtotal"] = col_z
-        cols["summary_subtotal_product"] = col_z
-        cols["total_payment"] = col_z
-
+    # =====================================================
+    # KHUSUS TEMPLATE YANG ADA KOLOM PAJAK
+    #
+    # Mapping:
+    # Q = Harga Satuan
+    # R = Subtotal per item/baris
+    # T = Subtotal Produk (summary kanan)
+    # U = Diskon
+    # Z = Total Pembayaran
+    #
+    # Permintaan terbaru:
+    # subtotal footer di tabel detail produk juga harus ambil dari Z
+    # =====================================================
     if cols["tax"] is not None:
         col_q = get_column_by_excel_letter(df, "Q")
         col_r = get_column_by_excel_letter(df, "R")
+        col_t = get_column_by_excel_letter(df, "T")
         col_u = get_column_by_excel_letter(df, "U")
         col_z = get_column_by_excel_letter(df, "Z")
 
@@ -621,12 +629,13 @@ def resolve_columns(df):
             cols["unit_price"] = col_q
         if col_r is not None:
             cols["line_subtotal"] = col_r
+        if col_t is not None:
+            cols["summary_subtotal_product"] = col_t
         if col_u is not None:
             cols["discount"] = col_u
         if col_z is not None:
             cols["total_payment"] = col_z
             cols["detail_footer_subtotal"] = col_z
-            cols["summary_subtotal_product"] = col_z
 
     return cols
 
@@ -649,10 +658,11 @@ def build_invoice_story(order_df, order_no, invoice_no, styles, cols):
         get_first_available_value(row0, [cols["store_name"]], "-")
     )
 
-    total_payment = safe_num(
-        get_first_available_value(row0, [cols["total_payment"]], 0)
-    )
-
+    # =====================================================
+    # SUMMARY KANAN: Subtotal Produk
+    # - non pajak: tetap pakai jumlah subtotal detail
+    # - pajak: pakai kolom T
+    # =====================================================
     grand_total = 0
     if cols["summary_subtotal_product"] and cols["summary_subtotal_product"] in row0.index:
         grand_total = safe_num(row0.get(cols["summary_subtotal_product"], 0))
@@ -666,20 +676,28 @@ def build_invoice_story(order_df, order_no, invoice_no, styles, cols):
         get_first_available_value(row0, [cols["voucher"]], 0)
     )
 
+    # =====================================================
+    # PAJAK OPSIONAL
+    # =====================================================
     tax = 0
     if cols["tax"] and cols["tax"] in order_df.columns:
         tax = float(order_df[cols["tax"]].fillna(0).apply(safe_num).sum())
 
+    total_payment = safe_num(
+        get_first_available_value(row0, [cols["total_payment"]], 0)
+    )
+
     if total_payment <= 0:
         total_payment = grand_total + shipping_est + tax - voucher
 
-    detail_footer_subtotal = total_payment
+    # =====================================================
+    # FOOTER SUBTOTAL DI TABEL DETAIL PRODUK
+    # - non pajak: tetap seperti lama = grand_total
+    # - pajak: ambil dari Z
+    # =====================================================
+    detail_footer_subtotal = grand_total
     if cols["detail_footer_subtotal"] and cols["detail_footer_subtotal"] in row0.index:
-        detail_footer_subtotal = safe_num(
-            row0.get(cols["detail_footer_subtotal"], total_payment)
-        )
-
-    grand_total = total_payment
+        detail_footer_subtotal = safe_num(row0.get(cols["detail_footer_subtotal"], grand_total))
 
     story = []
 
@@ -864,6 +882,7 @@ def build_invoice_story(order_df, order_no, invoice_no, styles, cols):
             get_first_available_value(row, [cols["line_subtotal"]], 0)
         )
 
+        # fallback kalau subtotal item kosong
         if subtotal <= 0 and price > 0 and qty > 0:
             subtotal = (price * qty) - disc
 
@@ -1047,6 +1066,7 @@ def convert_excel_to_single_pdf(
 
     cols = resolve_columns(df)
 
+    # normalisasi kolom utama
     df[cols["order_no"]] = df[cols["order_no"]].astype(str).str.strip()
     df[cols["invoice_no"]] = df[cols["invoice_no"]].astype(str).str.strip()
 
