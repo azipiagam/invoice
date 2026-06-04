@@ -1,3 +1,4 @@
+<!-- Service config updated after repo/folder rename to billforge -->
 <service>
   <id>BillForge</id>
   <name>BillForge Invoice API</name>
