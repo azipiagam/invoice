@@ -258,29 +258,49 @@ export default function WorkspaceCard({
             </p>
           </div>
 
-          {selectedFile ? (
-            <div className="workspace-hint workspace-hint--data">
-              {fileInfoFailed ? (
-                <p className="workspace-hint__error">Could not read this file's contents.</p>
-              ) : fileInfo ? (
-                <>
-                  <span className="workspace-hint__count">{fileInfo.rows}</span>
-                  <span className="workspace-hint__label">rows of data detected</span>
-                  <span className="workspace-hint__sub">
-                    {fileInfo.columns} columns · Sheet: {fileInfo.sheetName}
-                  </span>
-                </>
+          <div className="workspace-history">
+            <span className="dashboard-card__label">Invoice History</span>
+            <div className="workspace-history__list">
+              {history.length === 0 ? (
+                <p className="workspace-history__empty">No invoices generated yet.</p>
               ) : (
-                <p className="workspace-hint__loading">Reading file...</p>
+                history.map((item) => (
+                  <div key={item.filename} className="workspace-history__item">
+                    <div className="workspace-history__info">
+                      <FileText01 size={15} />
+                      <div className="workspace-history__text">
+                        <span className="workspace-history__name">{item.filename}</span>
+                        <span className="workspace-history__meta">
+                          {formatHistoryDate(item.created_at)}
+                          {item.size ? ` · ${formatHistorySize(item.size)}` : ""}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="workspace-history__actions">
+                      <button
+                        type="button"
+                        className="workspace-history__icon-button"
+                        onClick={() => handleOpenHistoryItem(item)}
+                        aria-label={`View ${item.filename}`}
+                        title="View"
+                      >
+                        <Eye size={14} />
+                      </button>
+                      <button
+                        type="button"
+                        className="workspace-history__icon-button workspace-history__icon-button--download"
+                        onClick={() => handleDownloadHistoryItem(item)}
+                        aria-label={`Download ${item.filename}`}
+                        title="Download"
+                      >
+                        <Download01 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                ))
               )}
             </div>
-          ) : (
-            <ul className="workspace-hint">
-              {uploadTips.map((tip) => (
-                <li key={tip}>{tip}</li>
-              ))}
-            </ul>
-          )}
+          </div>
 
           <div className="upload-form-row">
             <label className="upload-form-field">
@@ -391,49 +411,29 @@ export default function WorkspaceCard({
             </div>
           </div>
 
-          <div className="workspace-history">
-            <span className="dashboard-card__label">Invoice History</span>
-            <div className="workspace-history__list">
-              {history.length === 0 ? (
-                <p className="workspace-history__empty">No invoices generated yet.</p>
+          {selectedFile ? (
+            <div className="workspace-hint workspace-hint--data">
+              {fileInfoFailed ? (
+                <p className="workspace-hint__error">Could not read this file's contents.</p>
+              ) : fileInfo ? (
+                <>
+                  <span className="workspace-hint__count">{fileInfo.rows}</span>
+                  <span className="workspace-hint__label">rows of data detected</span>
+                  <span className="workspace-hint__sub">
+                    {fileInfo.columns} columns · Sheet: {fileInfo.sheetName}
+                  </span>
+                </>
               ) : (
-                history.map((item) => (
-                  <div key={item.filename} className="workspace-history__item">
-                    <div className="workspace-history__info">
-                      <FileText01 size={15} />
-                      <div className="workspace-history__text">
-                        <span className="workspace-history__name">{item.filename}</span>
-                        <span className="workspace-history__meta">
-                          {formatHistoryDate(item.created_at)}
-                          {item.size ? ` · ${formatHistorySize(item.size)}` : ""}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="workspace-history__actions">
-                      <button
-                        type="button"
-                        className="workspace-history__icon-button"
-                        onClick={() => handleOpenHistoryItem(item)}
-                        aria-label={`View ${item.filename}`}
-                        title="View"
-                      >
-                        <Eye size={14} />
-                      </button>
-                      <button
-                        type="button"
-                        className="workspace-history__icon-button"
-                        onClick={() => handleDownloadHistoryItem(item)}
-                        aria-label={`Download ${item.filename}`}
-                        title="Download"
-                      >
-                        <Download01 size={14} />
-                      </button>
-                    </div>
-                  </div>
-                ))
+                <p className="workspace-hint__loading">Reading file...</p>
               )}
             </div>
-          </div>
+          ) : (
+            <ul className="workspace-hint">
+              {uploadTips.map((tip) => (
+                <li key={tip}>{tip}</li>
+              ))}
+            </ul>
+          )}
 
           <div className="workspace-result">
             <div className="upload-file-chip">

@@ -115,7 +115,19 @@ function InvoiceApp() {
         const res = await axios.get(`${API_BASE}/progress/${jobId}`);
         const data = res.data;
         setJobStatus(data.status);
-        setProgress(data.percent ?? 0);
+
+        if (data.status === "processing") {
+          // Backend reports its own 0-100% for this phase; remap it into the
+          // "Process" band (65-99%) so the bar keeps moving forward instead
+          // of jumping back after the upload phase (which ends around 60%).
+          const backendPercent = Math.max(0, Math.min(100, Number(data.percent) || 0));
+          setProgress(65 + Math.round((backendPercent / 100) * 34));
+        } else if (data.status === "completed") {
+          setProgress(100);
+        } else {
+          setProgress((prev) => Math.max(prev, data.percent ?? 0));
+        }
+
         setStatusText(data.message ?? "");
         setCurrentInvoice(data.current_invoice ?? "");
         setCurrentCount(data.current ?? 0);
