@@ -2205,6 +2205,41 @@ select {
   .workspace-grid {
     grid-template-columns: 1fr;
   }
+
+  /* The single-screen "no-scroll" layout only works when everything fits
+     one viewport (desktop). On narrow screens the stacked content is
+     taller than the viewport, so let the page flow naturally and scroll
+     instead of forcing a fixed height (which was squashing/clipping
+     sections). */
+  .dashboard-main--no-scroll {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .dashboard-main--no-scroll .workspace-panel {
+    height: auto;
+    flex: none;
+  }
+
+  .workspace-grid {
+    flex: none;
+    min-height: 0;
+  }
+
+  .workspace-col {
+    min-height: 0;
+  }
+
+  .workspace-hint,
+  .workspace-history {
+    flex: none;
+    min-height: 140px;
+    max-height: 280px;
+  }
+
+  .workspace-result {
+    margin-top: 0;
+  }
 }
 
 /* ── Icon support ───────────────────────────────────────────────── */
