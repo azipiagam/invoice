@@ -1,13 +1,13 @@
-import { ChevronLeft, ChevronRight, XClose } from './icons.jsx'
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 
-import './templateComponents.css'
+import { ChevronLeft, ChevronRight, XClose } from './TemplateIcons.jsx'
 import {
   defaultNavigationPath,
   implementedNavigationPaths,
   primaryNavigationItems,
   secondaryNavigationItems,
-} from './navigation.js'
+} from '../../services/templateServices/Navigation.js'
+import '../../styles/templateStyle/TemplateComponents.css'
 
 function getInitials(name) {
   return name
@@ -38,6 +38,10 @@ function getInitiallyExpandedGroups(items, currentPath) {
   return items.reduce((expandedGroups, item) => {
     if (item.children?.length && isItemActive(item, currentPath)) {
       expandedGroups[getGroupKey(item)] = true
+    }
+
+    if (item.children?.length) {
+      Object.assign(expandedGroups, getInitiallyExpandedGroups(item.children, currentPath))
     }
 
     return expandedGroups
@@ -74,10 +78,7 @@ function SidebarNavItem({
   const content = (
     <>
       {Icon ? (
-        <Icon
-          className={`nav-icon${item.iconFlip ? ' nav-icon--flip' : ''}`}
-          size={20}
-        />
+        <Icon className="nav-icon" size={22} />
       ) : (
         <span className="nav-item__bullet" aria-hidden="true" />
       )}
@@ -163,37 +164,27 @@ function Sidebar({
   onToggleCollapse,
   onCloseMobile,
 }) {
-  const [selectedPath, setSelectedPath] = useState(activePath)
-  const [expandedGroups, setExpandedGroups] = useState(() =>
-    getInitiallyExpandedGroups([...primaryItems, ...secondaryItems], activePath)
-  )
+  const [expandedGroups, setExpandedGroups] = useState({})
   const initials = getInitials(userName)
-
-  useEffect(() => {
-    setSelectedPath(activePath)
-  }, [activePath])
-
-  useEffect(() => {
-    const activeGroups = getInitiallyExpandedGroups([...primaryItems, ...secondaryItems], activePath)
-
-    if (Object.keys(activeGroups).length === 0) {
-      return
-    }
-
-    setExpandedGroups((currentGroups) => ({
-      ...currentGroups,
-      ...activeGroups,
-    }))
-  }, [activePath, primaryItems, secondaryItems])
+  const activeExpandedGroups = useMemo(
+    () => getInitiallyExpandedGroups([...primaryItems, ...secondaryItems], activePath),
+    [activePath, primaryItems, secondaryItems],
+  )
+  const visibleExpandedGroups = useMemo(
+    () => ({
+      ...expandedGroups,
+      ...activeExpandedGroups,
+    }),
+    [activeExpandedGroups, expandedGroups],
+  )
 
   const handleSelect = async (item) => {
     if (item.external && item.href) {
-      window.location.assign(item.href)
-
       if (mobileOpen) {
         onCloseMobile?.()
       }
 
+      window.location.assign(item.href)
       return
     }
 
@@ -213,8 +204,6 @@ function Sidebar({
 
     if (item.href && implementedNavigationPaths.includes(item.href)) {
       const nextPath = item.href || defaultNavigationPath
-
-      setSelectedPath(nextPath)
 
       if (window.location.pathname !== nextPath) {
         window.history.pushState({}, '', nextPath)
@@ -252,8 +241,6 @@ function Sidebar({
   ]
     .filter(Boolean)
     .join(' ')
-  const navItems = primaryItems
-  const footerItems = secondaryItems
 
   return (
     <aside id="sidebar" className={sidebarClassName}>
@@ -294,39 +281,37 @@ function Sidebar({
       </div>
 
       <nav className="sidebar-nav" aria-label="Main navigation">
-        {navItems.map((item) => (
+        {primaryItems.map((item) => (
           <SidebarNavItem
             key={getItemKey(item)}
             item={item}
-            selectedPath={selectedPath}
+            selectedPath={activePath}
             collapsed={collapsed}
             onSelect={handleSelect}
-            expandedGroups={expandedGroups}
+            expandedGroups={visibleExpandedGroups}
             onToggleGroup={handleToggleGroup}
           />
         ))}
       </nav>
 
       <div className="sidebar-bottom">
-        {footerItems.map((item) => (
+        {secondaryItems.map((item) => (
           <SidebarNavItem
             key={getItemKey(item)}
             item={item}
-            selectedPath={selectedPath}
+            selectedPath={activePath}
             collapsed={collapsed}
             onSelect={handleSelect}
-            expandedGroups={expandedGroups}
+            expandedGroups={visibleExpandedGroups}
             onToggleGroup={handleToggleGroup}
           />
         ))}
       </div>
 
-      {!collapsed ? (
-        <div className="sidebar-copyright" aria-label="Copyright">
-          <p>&copy; 2026 PT Pilar Niaga Makmur</p>
-          <p>Developed by IT Team</p>
-        </div>
-      ) : null}
+      <div className="sidebar-copyright" aria-label="Copyright">
+        <p>&copy; 2026 PT Pilar Niaga Makmur</p>
+        <p>Developed by IT Team </p>
+      </div>
     </aside>
   )
 }

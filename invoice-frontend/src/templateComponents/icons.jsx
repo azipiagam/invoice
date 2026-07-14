@@ -9,6 +9,14 @@ import MenuRoundedIcon from '@mui/icons-material/MenuRounded'
 import NotificationsNoneRoundedIcon from '@mui/icons-material/NotificationsNoneRounded'
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded'
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
+import CloudUploadRoundedIcon from '@mui/icons-material/CloudUploadRounded'
+import InsertDriveFileRoundedIcon from '@mui/icons-material/InsertDriveFileRounded'
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded'
+import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded'
+import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded'
+import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
+import FolderOpenRoundedIcon from '@mui/icons-material/FolderOpenRounded'
+import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded'
 
 function createIconComponent(IconComponent) {
   return function WrappedIcon({ size = 20, className, style, ...props }) {
@@ -41,3 +49,11 @@ export const Menu01 = createIconComponent(MenuRoundedIcon)
 export const RefreshCw05 = createIconComponent(RefreshRoundedIcon)
 export const SearchMd = createIconComponent(SearchRoundedIcon)
 export const XClose = createIconComponent(CloseRoundedIcon)
+export const CloudUpload = createIconComponent(CloudUploadRoundedIcon)
+export const FileText01 = createIconComponent(InsertDriveFileRoundedIcon)
+export const CheckCircle = createIconComponent(CheckCircleRoundedIcon)
+export const AlertCircle = createIconComponent(ErrorOutlineRoundedIcon)
+export const Download01 = createIconComponent(DownloadRoundedIcon)
+export const Eye = createIconComponent(VisibilityRoundedIcon)
+export const FolderOpen = createIconComponent(FolderOpenRoundedIcon)
+export const PlayArrow = createIconComponent(PlayArrowRoundedIcon)

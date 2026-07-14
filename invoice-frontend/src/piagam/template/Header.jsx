@@ -1,19 +1,26 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Bell04, ChevronDown, Menu01, RefreshCw05, SearchMd, XClose } from './icons.jsx'
+import {
+  Bell04,
+  ChevronDown,
+  Menu01,
+  RefreshCw05,
+  SearchMd,
+  XClose,
+} from './TemplateIcons.jsx'
 
-import logoPiagam from './assets/logo-piagam.png'
-import logoPiagamTransparent from './assets/logo-piagam2.png'
-import './templateComponents.css'
+import logoPiagam from '../../images/logo-piagam2.svg'
+import logoPiagamTransparent from '../../images/logo-piagam.svg'
 import {
   ALL_DEPARTMENTS_FILTER_ID,
   ALL_DEPARTMENTS_FILTER_LABEL,
   getDepartmentFilterOptions,
   getSelectedDepartmentFilterLabel,
 } from './departmentFilter.js'
+import '../../styles/templateStyle/TemplateComponents.css'
 
 function Header({
-  title = 'Bill Forge',
+  title = 'Nama Project',
   breadcrumb = [
     { label: 'All', href: '#' },
     { label: 'Finance', href: '#', active: true },
@@ -23,14 +30,12 @@ function Header({
   onMenuToggle,
   notificationProps,
   onRefresh,
-  onReset,
   searchProps,
   showMenuButton = false,
   departmentFilterProps,
 }) {
   const hasSearch = Boolean(searchProps)
   const hasNotification = Boolean(notificationProps)
-  const isCompactActionRow = !hasSearch
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false)
   const [isDepartmentDropdownOpen, setIsDepartmentDropdownOpen] = useState(false)
   const [departmentDropdownStyle, setDepartmentDropdownStyle] = useState(null)
@@ -107,13 +112,8 @@ function Header({
     }
   }, [isDepartmentDropdownOpen])
 
-  useEffect(() => {
-    setIsDepartmentDropdownOpen(false)
-  }, [departmentFilterProps?.selectedDepartmentId])
-
   useLayoutEffect(() => {
     if (!isDepartmentDropdownOpen) {
-      setDepartmentDropdownStyle(null)
       return undefined
     }
 
@@ -275,11 +275,7 @@ function Header({
       </div>
 
       <div className="header-breadcrumb">
-        <div
-          className={`header-breadcrumb-content${
-            isCompactActionRow ? ' header-breadcrumb-content--inline-mobile' : ''
-          }`}
-        >
+        <div className="header-breadcrumb-content">
           <nav
             className="breadcrumb-nav"
             aria-label={departmentFilterProps ? 'Filter divisi' : 'Breadcrumb'}
@@ -288,12 +284,8 @@ function Header({
             {renderBreadcrumb()}
           </nav>
 
-          {hasSearch || hasNotification || onRefresh || onReset ? (
-            <div
-              className={`header-toolbar${
-                isCompactActionRow ? ' header-toolbar--inline-mobile' : ''
-              }`}
-            >
+          {hasSearch || hasNotification || onRefresh ? (
+            <div className="header-toolbar">
               {hasSearch ? (
                 <label
                   className="header-search header-search--compact"
@@ -331,18 +323,6 @@ function Header({
                   aria-label="Refresh dashboard"
                   title="Refresh dashboard"
                   onClick={onRefresh}
-                >
-                  <RefreshCw05 size={16} />
-                </button>
-              ) : null}
-
-              {onReset ? (
-                <button
-                  type="button"
-                  className="header-icon-button header-icon-button--compact"
-                  aria-label="Reset form invoice"
-                  title="Reset form invoice"
-                  onClick={onReset}
                 >
                   <RefreshCw05 size={16} />
                 </button>

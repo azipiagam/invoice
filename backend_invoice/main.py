@@ -232,6 +232,31 @@ def get_progress(
     return dict(job)
 
 
+@app.get("/history")
+def get_history(
+    limit: int = 20,
+    current_user: dict = Depends(verify_token),
+):
+    if not OUTPUT_DIR.exists():
+        return {"items": []}
+
+    files = [f for f in OUTPUT_DIR.iterdir() if f.is_file() and f.suffix.lower() == ".pdf"]
+    files.sort(key=lambda f: f.stat().st_mtime, reverse=True)
+
+    items = []
+    for f in files[:limit]:
+        stat = f.stat()
+        items.append({
+            "filename": f.name,
+            "size": stat.st_size,
+            "created_at": datetime.fromtimestamp(stat.st_mtime).isoformat(),
+            "preview_url": f"/preview/{f.name}",
+            "download_url": f"/download/{f.name}",
+        })
+
+    return {"items": items}
+
+
 @app.get("/preview/{filename}")
 def preview_file(filename: str):
     file_path = OUTPUT_DIR / filename

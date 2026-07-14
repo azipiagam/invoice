@@ -1,14 +1,12 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { Box, Snackbar, Stack, Typography } from "@mui/material";
+import { Box, Snackbar, Typography } from "@mui/material";
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import ErrorRoundedIcon from "@mui/icons-material/ErrorRounded";
 import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
-import ProcessStatus from "./components/ProcessStatus";
-import ResultCard from "./components/ResultCard";
-import UploadCard from "./components/UploadCard";
+import WorkspaceCard from "./components/WorkspaceCard";
 import { AuthProvider, useAuth } from "./auth/AuthContext";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import { BackgroundMain, Header, Sidebar } from "./templateComponents";
@@ -71,7 +69,7 @@ function InvoiceApp() {
   const [outputFolder, setOutputFolder] = useState("invoices_output");
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [statusText, setStatusText] = useState("Belum ada proses.");
+  const [statusText, setStatusText] = useState("No process yet.");
   const [result, setResult] = useState(null);
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -82,12 +80,26 @@ function InvoiceApp() {
   const [currentInvoice, setCurrentInvoice] = useState("");
   const [currentCount, setCurrentCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
-  const [errorMsg, setErrorMsg] = useState("");
+  const [, setErrorMsg] = useState("");
+  const [history, setHistory] = useState([]);
   const pollRef = useRef(null);
 
   const showSnackbar = (message, severity = "success") => {
     setSnackbar({ open: true, severity, message });
   };
+
+  const fetchHistory = async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/history`);
+      setHistory(res.data?.items ?? []);
+    } catch (err) {
+      console.warn("[history fetch error]", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchHistory();
+  }, []);
 
   const stopPolling = () => {
     if (pollRef.current) {
@@ -114,18 +126,19 @@ function InvoiceApp() {
           setIsProcessing(false);
           setResult(data);
           showSnackbar(
-            data.message || `${data.total_invoices ?? data.total} invoice berhasil dibuat.`,
+            data.message || `${data.total_invoices ?? data.total} invoices generated successfully.`,
             "success"
           );
+          fetchHistory();
         }
 
         if (data.status === "failed") {
           stopPolling();
           setIsProcessing(false);
-          setErrorMsg(data.error ?? "Terjadi kesalahan.");
-          setStatusText("Terjadi kesalahan saat proses generate.");
+          setErrorMsg(data.error ?? "An error occurred.");
+          setStatusText("An error occurred while generating.");
           setProgress(0);
-          showSnackbar(data.error || "Gagal memproses invoice.", "error");
+          showSnackbar(data.error || "Failed to process invoices.", "error");
         }
       } catch (err) {
         console.warn("[polling error]", err);
@@ -136,7 +149,7 @@ function InvoiceApp() {
   const handleFileChange = (file) => {
     setSelectedFile(file);
     setResult(null);
-    setStatusText("File siap diproses.");
+    setStatusText("File is ready to process.");
     setProgress(0);
     setJobStatus("idle");
     setCurrentInvoice("");
@@ -151,26 +164,26 @@ function InvoiceApp() {
     setOutputFolder("invoices_output");
     setIsProcessing(false);
     setProgress(0);
-    setStatusText("Belum ada proses.");
+    setStatusText("No process yet.");
     setResult(null);
     setJobStatus("idle");
     setCurrentInvoice("");
     setCurrentCount(0);
     setTotalCount(0);
     setErrorMsg("");
-    showSnackbar("Form berhasil direset.", "info");
+    showSnackbar("Form reset successfully.", "info");
   };
 
   const handleGenerate = async () => {
     if (!selectedFile) {
-      showSnackbar("Silakan pilih file Excel terlebih dahulu.", "warning");
+      showSnackbar("Please select an Excel file first.", "warning");
       return;
     }
 
     stopPolling();
     setIsProcessing(true);
     setProgress(10);
-    setStatusText("Menyiapkan upload file...");
+    setStatusText("Preparing file upload...");
     setResult(null);
     setJobStatus("queued");
     setCurrentInvoice("");
@@ -184,7 +197,7 @@ function InvoiceApp() {
       formData.append("output_folder", outputFolder);
 
       setProgress(25);
-      setStatusText("Mengunggah file ke backend...");
+      setStatusText("Uploading file to backend...");
 
       const response = await axios.post(`${API_BASE}/generate-invoices`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -193,7 +206,7 @@ function InvoiceApp() {
           const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
           const mappedProgress = Math.min(20 + Math.round(percent * 0.4), 60);
           setProgress(mappedProgress);
-          setStatusText(`Upload file... ${percent}%`);
+          setStatusText(`Uploading file... ${percent}%`);
         },
       });
 
@@ -203,19 +216,20 @@ function InvoiceApp() {
         setResult(data);
         setProgress(100);
         setJobStatus("completed");
-        setStatusText(data.message || "Generate invoice selesai.");
-        showSnackbar(data.message || "Invoice berhasil dibuat.", "success");
+        setStatusText(data.message || "Invoice generation completed.");
+        showSnackbar(data.message || "Invoices generated successfully.", "success");
         setIsProcessing(false);
+        fetchHistory();
         return;
       }
 
-      setStatusText("File berhasil diupload, menunggu proses backend...");
+      setStatusText("File uploaded successfully, waiting for backend processing...");
       setJobStatus("queued");
       startPolling(data.job_id);
     } catch (error) {
       console.error("Generate invoice error:", error);
 
-      let errorMessage = "Gagal memproses invoice.";
+      let errorMessage = "Failed to process invoices.";
       if (error.response?.data?.detail) {
         errorMessage = error.response.data.detail;
       } else if (error.response?.data?.message) {
@@ -227,7 +241,7 @@ function InvoiceApp() {
       stopPolling();
       setJobStatus("failed");
       setErrorMsg(errorMessage);
-      setStatusText("Terjadi kesalahan saat proses generate.");
+      setStatusText("An error occurred while generating.");
       setProgress(0);
       setResult(null);
       setIsProcessing(false);
@@ -275,61 +289,23 @@ function InvoiceApp() {
           onReset={handleReset}
         />
 
-        <main className="dashboard-main">
-          <Stack spacing={3}>
-            <UploadCard
-              selectedFile={selectedFile}
-              outputFolder={outputFolder}
-              setOutputFolder={setOutputFolder}
-              onFileChange={handleFileChange}
-              onGenerate={handleGenerate}
-              onReset={handleReset}
-              isProcessing={isProcessing}
-              jobStatus={jobStatus}
-              statusText={statusText}
-              current={currentCount}
-              total={totalCount}
-            />
-
-            <ProcessStatus
-              isProcessing={isProcessing}
-              progress={progress}
-              statusText={statusText}
-              selectedFile={selectedFile}
-              jobStatus={jobStatus}
-              currentInvoice={currentInvoice}
-              current={currentCount}
-              total={totalCount}
-              error={errorMsg}
-            />
-
-            {result && <ResultCard result={result} />}
-          </Stack>
-
-          <Box sx={{ mt: 5, mb: 1, textAlign: "center" }}>
-            <Typography
-              sx={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: "0.75rem",
-                color: "rgba(35,57,113,0.45)",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-              }}
-            >
-              © 2026 PT Pilar Niaga Makmur. All rights reserved.
-            </Typography>
-            <Typography
-              sx={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: "0.75rem",
-                color: "rgba(35,57,113,0.45)",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-              }}
-            >
-              Developed by IT Team PT Pilar Niaga Makmur.
-            </Typography>
-          </Box>
+        <main className="dashboard-main dashboard-main--no-scroll">
+          <WorkspaceCard
+            selectedFile={selectedFile}
+            outputFolder={outputFolder}
+            setOutputFolder={setOutputFolder}
+            onFileChange={handleFileChange}
+            onGenerate={handleGenerate}
+            isProcessing={isProcessing}
+            jobStatus={jobStatus}
+            statusText={statusText}
+            current={currentCount}
+            total={totalCount}
+            currentInvoice={currentInvoice}
+            progress={progress}
+            result={result}
+            history={history}
+          />
         </main>
       </div>
 
