@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SI → XML | Konverter Excel ke XML Accurate 5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --bg:#F4F5F7;
+    --surface:#FFFFFF;
+    --border:#E1E4EA;
+    --border-strong:#C9CEDA;
+    --ink:#1B2333;
+    --ink-soft:#5B6472;
+    --ink-faint:#8991A0;
+    --primary:#1F3C88;
+    --primary-dark:#152A63;
+    --primary-soft:#EAF0FF;
+    --accent:#B8842E;
+    --accent-soft:#FAF1DE;
+    --success:#1F8A5A;
+    --success-soft:#E7F6EE;
+    --error:#C0392B;
+    --error-soft:#FBEAE8;
+    --radius-lg:14px;
+    --radius-md:10px;
+    --radius-sm:6px;
+    --font-display:'Sora',sans-serif;
+    --font-body:'Inter',sans-serif;
+    --font-mono:'JetBrains Mono',monospace;
+    --shadow:0 1px 2px rgba(20,25,40,.04), 0 8px 24px -12px rgba(20,25,40,.10);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .topbar{
+    display:flex;align-items:center;gap:12px;
+    padding:18px 32px;
+    border-bottom:1px solid var(--border);
+    background:var(--surface);
+  }
+  .mark{
+    width:36px;height:36px;border-radius:9px;
+    background:linear-gradient(155deg,var(--primary),var(--primary-dark));
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-display);font-weight:700;color:#fff;font-size:13px;
+    letter-spacing:.02em;
+    flex-shrink:0;
+  }
+  .brand-text{line-height:1.15;}
+  .brand-title{font-family:var(--font-display);font-weight:600;font-size:15px;color:var(--ink);}
+  .brand-sub{font-size:12px;color:var(--ink-faint);}
+
+  main{max-width:760px;margin:0 auto;padding:56px 24px 100px;}
+
+  .hero{text-align:center;margin-bottom:40px;}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:12px;font-weight:600;color:var(--primary);
+    background:var(--primary-soft);padding:5px 12px;border-radius:999px;
+    letter-spacing:.03em;text-transform:uppercase;margin-bottom:18px;
+  }
+  h1{
+    font-family:var(--font-display);font-weight:700;
+    font-size:30px;line-height:1.25;margin:0 0 12px;color:var(--ink);
+  }
+  .hero p{
+    color:var(--ink-soft);font-size:15px;line-height:1.6;margin:0 auto;max-width:520px;
+  }
+
+  .steps{
+    display:flex;justify-content:center;gap:0;margin:30px auto 0;
+    max-width:480px;
+  }
+  .step{
+    flex:1;text-align:center;position:relative;padding-top:6px;
+  }
+  .step::before{
+    content:"";position:absolute;top:15px;left:-50%;width:100%;height:2px;
+    background:var(--border);z-index:0;
+  }
+  .step:first-child::before{display:none;}
+  .step.done::before{background:var(--primary);}
+  .step-dot{
+    width:30px;height:30px;border-radius:50%;background:var(--surface);
+    border:2px solid var(--border-strong);color:var(--ink-faint);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 8px;
+    font-family:var(--font-display);font-weight:600;font-size:13px;
+    position:relative;z-index:1;transition:all .25s ease;
+  }
+  .step.active .step-dot{border-color:var(--primary);color:var(--primary);background:var(--primary-soft);}
+  .step.done .step-dot{border-color:var(--primary);background:var(--primary);color:#fff;}
+  .step-label{font-size:12px;color:var(--ink-faint);font-weight:500;}
+  .step.active .step-label,.step.done .step-label{color:var(--ink);}
+
+  .card{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius-lg);box-shadow:var(--shadow);
+    padding:28px;margin-top:20px;
+  }
+
+  .dropzone{
+    border:2px dashed var(--border-strong);
+    border-radius:var(--radius-md);
+    padding:48px 24px;text-align:center;cursor:pointer;
+    transition:border-color .2s ease, background .2s ease;
+  }
+  .dropzone:hover,.dropzone.drag{
+    border-color:var(--primary);background:var(--primary-soft);
+  }
+  .dropzone svg{margin-bottom:14px;}
+  .dropzone-title{font-weight:600;font-size:15px;color:var(--ink);margin-bottom:4px;}
+  .dropzone-sub{font-size:13px;color:var(--ink-faint);}
+  .dropzone input{display:none;}
+
+  .file-chip{
+    display:flex;align-items:center;gap:12px;
+    padding:14px 16px;border:1px solid var(--border);border-radius:var(--radius-md);
+    background:#FBFBFC;margin-bottom:20px;
+  }
+  .file-chip svg{flex-shrink:0;}
+  .file-chip-name{font-weight:600;font-size:14px;color:var(--ink);}
+  .file-chip-meta{font-size:12px;color:var(--ink-faint);}
+  .file-chip-remove{
+    margin-left:auto;background:none;border:none;color:var(--ink-faint);
+    cursor:pointer;font-size:13px;font-family:var(--font-body);
+  }
+  .file-chip-remove:hover{color:var(--error);}
+
+  .stats-row{display:flex;gap:12px;margin-bottom:20px;}
+  .stat{
+    flex:1;border:1px solid var(--border);border-radius:var(--radius-md);
+    padding:14px 16px;background:#FBFBFC;
+  }
+  .stat-num{font-family:var(--font-display);font-weight:700;font-size:22px;color:var(--primary);}
+  .stat-label{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+
+  .branch-field{
+    border:1px solid var(--border);border-radius:var(--radius-md);
+    padding:12px 14px;background:#FBFBFC;margin-bottom:20px;
+  }
+  .branch-field label{
+    display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:6px;
+  }
+  .branch-field input{
+    font-family:var(--font-mono);font-size:13px;color:var(--ink);
+    border:1px solid var(--border-strong);border-radius:var(--radius-sm);
+    padding:8px 10px;width:220px;max-width:100%;
+  }
+  .branch-field input:focus{outline:2px solid var(--primary-soft);border-color:var(--primary);}
+  .branch-hint{display:block;font-size:11.5px;color:var(--ink-faint);margin-top:6px;line-height:1.4;}
+
+  .issues{border-radius:var(--radius-md);overflow:hidden;margin-bottom:20px;}
+  .issue{
+    display:flex;gap:10px;padding:12px 14px;font-size:13px;line-height:1.5;
+    border-left:3px solid var(--error);background:var(--error-soft);color:#7A2A20;
+  }
+  .issue + .issue{border-top:1px solid rgba(192,57,43,.12);}
+  .issue.warn{border-left-color:var(--accent);background:var(--accent-soft);color:#7A5A18;}
+  .issue b{color:inherit;}
+
+  .ok-banner{
+    display:flex;gap:10px;align-items:center;
+    padding:12px 14px;border-radius:var(--radius-md);
+    background:var(--success-soft);color:#15613F;font-size:13px;font-weight:500;
+    margin-bottom:20px;
+  }
+
+  button.btn{
+    font-family:var(--font-body);font-weight:600;font-size:14px;
+    padding:12px 22px;border-radius:var(--radius-md);border:none;cursor:pointer;
+    transition:transform .1s ease, box-shadow .15s ease, opacity .15s ease;
+  }
+  button.btn:active{transform:scale(.98);}
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-primary:hover{background:var(--primary-dark);}
+  .btn-primary:disabled{background:var(--border-strong);color:#fff;cursor:not-allowed;opacity:.7;}
+  .btn-ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--border-strong);}
+  .btn-ghost:hover{background:#F2F3F5;}
+  .btn-row{display:flex;gap:10px;}
+  .btn-full{width:100%;}
+
+  .result-head{display:flex;align-items:center;gap:14px;margin-bottom:22px;}
+  .stamp{
+    width:52px;height:52px;border-radius:50%;background:var(--success-soft);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .result-title{font-family:var(--font-display);font-weight:700;font-size:17px;color:var(--ink);}
+  .result-sub{font-size:13px;color:var(--ink-soft);margin-top:2px;}
+
+  .preview-toggle{
+    font-size:13px;color:var(--primary);font-weight:600;cursor:pointer;
+    display:inline-flex;align-items:center;gap:5px;margin-bottom:12px;user-select:none;
+  }
+  .preview-toggle svg{transition:transform .2s ease;}
+  .preview-toggle.open svg{transform:rotate(90deg);}
+  pre.xml-preview{
+    display:none;
+    font-family:var(--font-mono);font-size:12px;line-height:1.6;
+    background:#161B22;color:#C9D1D9;padding:18px;border-radius:var(--radius-md);
+    overflow:auto;max-height:340px;margin:0 0 20px;
+  }
+  pre.xml-preview.show{display:block;}
+  .xml-tag{color:#7EE3C0;}
+  .xml-attr{color:#E8B36A;}
+  .xml-val{color:#9ECBFF;}
+
+  footer{
+    text-align:center;padding:30px 24px 50px;color:var(--ink-faint);font-size:12px;
+  }
+  footer a{color:var(--ink-soft);}
+
+  .hidden{display:none !important;}
+  .section-title{font-family:var(--font-display);font-weight:600;font-size:14px;color:var(--ink);margin:0 0 14px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="mark">SI</div>
+  <div class="brand-text">
+    <div class="brand-title">SI → XML Converter</div>
+    <div class="brand-sub">Untuk import Sales Invoice ke Accurate 5 Desktop</div>
+  </div>
+</div>
+
+<main>
+  <div class="hero">
+    <div class="eyebrow">Accurate 5 Desktop</div>
+    <h1>Ubah Template Excel Sales Invoice<br>menjadi File XML Siap Import</h1>
+    <p>Unggah file Excel yang sudah diisi menggunakan template "Data SI", periksa hasilnya, lalu unduh file XML dengan struktur NMEXML yang sama seperti hasil export Accurate 5.</p>
+
+    <div class="steps" id="steps">
+      <div class="step active" data-step="1"><div class="step-dot">1</div><div class="step-label">Unggah</div></div>
+      <div class="step" data-step="2"><div class="step-dot">2</div><div class="step-label">Periksa</div></div>
+      <div class="step" data-step="3"><div class="step-dot">3</div><div class="step-label">Unduh</div></div>
+    </div>
+  </div>
+
+  <!-- STEP 1: UPLOAD -->
+  <div class="card" id="uploadCard">
+    <div class="section-title">Unggah file Excel</div>
+    <div class="dropzone" id="dropzone">
+      <input type="file" id="fileInput" accept=".xlsx,.xls">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <rect x="7" y="4" width="26" height="32" rx="3" stroke="#1F3C88" stroke-width="2"/>
+        <path d="M13 14h14M13 20h14M13 26h9" stroke="#1F3C88" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="30" cy="30" r="8" fill="#B8842E"/>
+        <path d="M27 30l2.2 2.2L33 28" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="dropzone-title">Seret file ke sini, atau klik untuk memilih</div>
+      <div class="dropzone-sub">Format .xlsx — gunakan sheet bernama "Data SI"</div>
+    </div>
+  </div>
+
+  <!-- STEP 2: PREVIEW / VALIDASI -->
+  <div class="card hidden" id="summaryCard">
+    <div class="section-title">Ringkasan data</div>
+    <div class="file-chip" id="fileChip"></div>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-num" id="statInvoice">0</div><div class="stat-label">Invoice terdeteksi</div></div>
+      <div class="stat"><div class="stat-num" id="statItem">0</div><div class="stat-label">Baris barang</div></div>
+      <div class="stat"><div class="stat-num" id="statError">0</div><div class="stat-label">Baris bermasalah</div></div>
+    </div>
+    <div class="branch-field">
+      <label for="branchCode">Branch ID (BranchCode)</label>
+      <input type="text" id="branchCode" value="1142293583">
+      <span class="branch-hint">Otomatis terisi Branch ID perusahaan Anda. Ubah di sini kalau suatu saat perlu import ke cabang lain.</span>
+    </div>
+    <div id="issueList"></div>
+    <div class="btn-row">
+      <button class="btn btn-primary btn-full" id="convertBtn">Konversi ke XML</button>
+      <button class="btn btn-ghost" id="resetBtn1">Ganti file</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: HASIL -->
+  <div class="card hidden" id="resultCard">
+    <div class="result-head">
+      <div class="stamp">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="11" stroke="#1F8A5A" stroke-width="1.6"/>
+          <path d="M7 12.5l3 3 7-7.5" stroke="#1F8A5A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div>
+        <div class="result-title" id="resultTitle">Konversi berhasil</div>
+        <div class="result-sub" id="resultSub"></div>
+      </div>
+    </div>
+
+    <div class="preview-toggle" id="previewToggle">
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 1l6 4-6 4V1z" fill="#1F3C88"/></svg>
+      Lihat isi XML
+    </div>
+    <pre class="xml-preview" id="xmlPreview"></pre>
+
+    <div class="btn-row">
+      <button class="btn btn-primary btn-full" id="downloadBtn">Unduh File XML</button>
+      <button class="btn btn-ghost" id="resetBtn2">Konversi file lain</button>
+    </div>
+  </div>
+</main>
+
+<footer>
+  File diproses sepenuhnya di browser Anda — tidak diunggah ke server manapun.<br>
+  Struktur mengikuti format NMEXML Accurate 5 Desktop (SALESINVOICE).
+</footer>
+
+<script>
+// Urutan kolom HARUS sama persis dengan urutan kolom di template "Data SI"
+const COLUMNS = [
+  "INVOICENO","INVOICEDATE","CUSTOMERID","TERMSID","SHIPVIA","WAREHOUSEID","SALESMANID",
+  "SHIPTO1","SHIPTO2","SHIPTO3","SHIPTO4","SHIPTO5","DESCRIPTION","SHIPDATE","TAXDATE",
+  "PURCHASEORDERNO","TAX1CODE","TAX1RATE","TAX2CODE","TAX2RATE","RATE","INCLUSIVETAX",
+  "CUSTOMERISTAXABLE","CASHDISCOUNT","CASHDISCPC","FREIGHT","FISCALRATE","ARACCOUNT",
+  "CURRENCYNAME","TAXFORMNUMBER","TAXFORMCODE","DELIVERYORDER","SOID","DOID","ITEMNO",
+  "ITEMOVDESC","QUANTITY","ITEMUNIT","UNITRATIO","UNITPRICE","ITEMDISCPC","TAXCODES",
+  "WAREHOUSEID_ITEM"
+];
+const SHEET_NAME = "Data SI";
+const DATA_START_ROW = 2; // index 0-based: baris 1=header, baris 2=tag XML, baris 3(index2)=data pertama
+
+let state = { rows: [], invoices: [], errors: [], fileName: "", fileSize: 0 };
+
+const $ = (id) => document.getElementById(id);
+const dropzone = $("dropzone");
+const fileInput = $("fileInput");
+
+["dragenter","dragover"].forEach(ev=>dropzone.addEventListener(ev, e=>{e.preventDefault();dropzone.classList.add("drag");}));
+["dragleave","drop"].forEach(ev=>dropzone.addEventListener(ev, e=>{e.preventDefault();dropzone.classList.remove("drag");}));
+dropzone.addEventListener("drop", e=>{
+  const f = e.dataTransfer.files[0];
+  if(f) handleFile(f);
+});
+dropzone.addEventListener("click", ()=>fileInput.click());
+fileInput.addEventListener("change", e=>{
+  if(e.target.files[0]) handleFile(e.target.files[0]);
+});
+
+function setStep(n){
+  document.querySelectorAll(".step").forEach(s=>{
+    const idx = parseInt(s.dataset.step);
+    s.classList.toggle("active", idx===n);
+    s.classList.toggle("done", idx<n);
+  });
+}
+
+function fmtSize(bytes){
+  if(bytes < 1024) return bytes + " B";
+  if(bytes < 1024*1024) return (bytes/1024).toFixed(1) + " KB";
+  return (bytes/1024/1024).toFixed(1) + " MB";
+}
+
+function handleFile(file){
+  state.fileName = file.name;
+  state.fileSize = file.size;
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    try{
+      const wb = XLSX.read(e.target.result, {type:"array", cellDates:true});
+      const sheetName = wb.SheetNames.find(n => n.trim().toLowerCase() === SHEET_NAME.toLowerCase()) || wb.SheetNames[0];
+      const ws = wb.Sheets[sheetName];
+      const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:"", raw:false, dateNF:"yyyy-mm-dd"});
+      processRows(rows);
+    }catch(err){
+      alert("Gagal membaca file: " + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function cellToStr(v){
+  if(v===null || v===undefined) return "";
+  if(v instanceof Date){
+    const p=(n)=>String(n).padStart(2,"0");
+    return v.getFullYear()+"-"+p(v.getMonth()+1)+"-"+p(v.getDate());
+  }
+  return String(v).trim();
+}
+
+function processRows(rawRows){
+  const dataRows = rawRows.slice(DATA_START_ROW).filter(r => r.some(c => cellToStr(c) !== ""));
+  const parsed = dataRows.map(r=>{
+    const obj = {};
+    COLUMNS.forEach((tag, i)=> obj[tag] = cellToStr(r[i]));
+    return obj;
+  });
+
+  // Group by INVOICENO (baris berurutan dengan INVOICENO sama = 1 invoice)
+  const invoices = [];
+  const errors = [];
+  let current = null;
+
+  parsed.forEach((row, i)=>{
+    const rowNum = i + DATA_START_ROW + 1; // nomor baris asli di excel (1-based)
+    if(row.INVOICENO === ""){
+      errors.push({row: rowNum, level:"error", msg:"No. Invoice (kolom A) kosong — baris dilewati."});
+      return;
+    }
+    if(!current || current.INVOICENO !== row.INVOICENO){
+      current = { INVOICENO: row.INVOICENO, header: row, items: [] };
+      invoices.push(current);
+    }
+    if(row.ITEMNO === ""){
+      errors.push({row: rowNum, level:"error", msg:`Invoice ${row.INVOICENO}: Kode Barang (ITEMNO) kosong.`});
+    } else {
+      if(row.QUANTITY === "" || isNaN(Number(row.QUANTITY))){
+        errors.push({row: rowNum, level:"error", msg:`Invoice ${row.INVOICENO}, barang ${row.ITEMNO}: Qty tidak valid.`});
+      }
+      if(row.UNITPRICE === "" || isNaN(Number(row.UNITPRICE))){
+        errors.push({row: rowNum, level:"error", msg:`Invoice ${row.INVOICENO}, barang ${row.ITEMNO}: Harga Satuan tidak valid.`});
+      }
+      current.items.push(row);
+    }
+    if(row.CUSTOMERID === ""){
+      errors.push({row: rowNum, level:"warn", msg:`Invoice ${row.INVOICENO}: Kode Customer kosong.`});
+    }
+    if(row.INVOICEDATE === ""){
+      errors.push({row: rowNum, level:"warn", msg:`Invoice ${row.INVOICENO}: Tanggal Invoice kosong.`});
+    }
+  });
+
+  invoices.forEach(inv=>{
+    if(inv.items.length===0){
+      errors.push({row:"-", level:"error", msg:`Invoice ${inv.INVOICENO} tidak punya baris barang sama sekali.`});
+    }
+  });
+
+  state.rows = parsed;
+  state.invoices = invoices;
+  state.errors = errors;
+  renderSummary();
+}
+
+function renderSummary(){
+  $("uploadCard").classList.add("hidden");
+  $("summaryCard").classList.remove("hidden");
+  $("resultCard").classList.add("hidden");
+  setStep(2);
+
+  $("fileChip").innerHTML = `
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="#EAF0FF"/><path d="M8 8h9l3 3v9H8V8z" stroke="#1F3C88" stroke-width="1.5"/></svg>
+    <div>
+      <div class="file-chip-name">${escapeHtml(state.fileName)}</div>
+      <div class="file-chip-meta">${fmtSize(state.fileSize)}</div>
+    </div>
+    <button class="file-chip-remove" id="chipRemove">Hapus</button>
+  `;
+  $("chipRemove").onclick = resetAll;
+
+  const totalItems = state.invoices.reduce((s,inv)=>s+inv.items.length,0);
+  const errorCount = state.errors.filter(e=>e.level==="error").length;
+
+  $("statInvoice").textContent = state.invoices.length;
+  $("statItem").textContent = totalItems;
+  $("statError").textContent = errorCount;
+
+  const list = $("issueList");
+  if(state.errors.length===0){
+    list.innerHTML = `<div class="ok-banner"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#1F8A5A" stroke-width="1.4"/><path d="M5 8.2l2 2 4-4.4" stroke="#1F8A5A" stroke-width="1.5" stroke-linecap="round"/></svg>Semua data terlihat lengkap dan siap dikonversi.</div>`;
+  } else {
+    list.innerHTML = `<div class="issues">` + state.errors.map(e=>`
+      <div class="issue ${e.level==='warn'?'warn':''}"><span>${e.level==='warn'?'⚠':'✕'}</span><span><b>Baris ${e.row}:</b> ${escapeHtml(e.msg)}</span></div>
+    `).join("") + `</div>`;
+  }
+
+  $("convertBtn").disabled = errorCount > 0;
+  $("convertBtn").onclick = doConvert;
+  $("resetBtn1").onclick = resetAll;
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function escapeXml(s){
+  return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function tag(name, value){
+  const v = (value===undefined||value===null) ? "" : String(value).trim();
+  return v==="" ? `<${name}/>` : `<${name}>${escapeXml(v)}</${name}>`;
+}
+function num(value, fallback){
+  const n = Number(value);
+  return (value==="" || isNaN(n)) ? fallback : n;
+}
+
+function buildXml(){
+  const branchCode = escapeXml($("branchCode").value.trim());
+  let out = `<?xml version="1.0"?>\n<NMEXML EximID="1" BranchCode="${branchCode}" ACCOUNTANTCOPYID=""><TRANSACTIONS OnError="CONTINUE">`;
+
+  state.invoices.forEach((inv, idx)=>{
+    const h = inv.header;
+    out += `<SALESINVOICE operation="Add" REQUESTID="${idx+1}">`;
+
+    inv.items.forEach((it, kIdx)=>{
+      const unitPrice = num(it.UNITPRICE, 0);
+      out += `<ITEMLINE operation="Add">`;
+      out += tag("KeyID", kIdx+1);
+      out += tag("ITEMNO", it.ITEMNO);
+      out += tag("QUANTITY", num(it.QUANTITY,0));
+      out += tag("ITEMUNIT", it.ITEMUNIT);
+      out += tag("UNITRATIO", num(it.UNITRATIO,1));
+      for(let r=1;r<=10;r++) out += `<ITEMRESERVED${r}/>`;
+      out += tag("ITEMOVDESC", it.ITEMOVDESC);
+      out += tag("UNITPRICE", unitPrice);
+      out += tag("ITEMDISCPC", it.ITEMDISCPC);
+      out += tag("TAXCODES", it.TAXCODES);
+      out += `<GROUPSEQ/>`;
+      out += tag("SOSEQ", 0);
+      out += tag("BRUTOUNITPRICE", unitPrice);
+      out += tag("WAREHOUSEID", it.WAREHOUSEID_ITEM || h.WAREHOUSEID);
+      out += tag("QTYCONTROL", 0);
+      if(it.DOID) out += tag("DOSEQ", 1);
+      else out += `<DOSEQ/>`;
+      out += tag("SOID", it.SOID);
+      out += tag("DOID", it.DOID);
+      out += `</ITEMLINE>`;
+    });
+
+    out += tag("INVOICENO", h.INVOICENO);
+    out += tag("INVOICEDATE", h.INVOICEDATE);
+    out += tag("TAX1CODE", h.TAX1CODE);
+    out += tag("TAX2CODE", h.TAX2CODE);
+    out += tag("TAX1RATE", num(h.TAX1RATE,0));
+    out += tag("TAX2RATE", num(h.TAX2RATE,0));
+    out += tag("RATE", num(h.RATE,1));
+    out += tag("INCLUSIVETAX", num(h.INCLUSIVETAX,0));
+    out += tag("CUSTOMERISTAXABLE", num(h.CUSTOMERISTAXABLE,0));
+    out += tag("CASHDISCOUNT", num(h.CASHDISCOUNT,0));
+    out += tag("CASHDISCPC", h.CASHDISCPC);
+    out += tag("FREIGHT", num(h.FREIGHT,0));
+    out += tag("TERMSID", h.TERMSID);
+    out += tag("SHIPVIA", h.SHIPVIA);
+    out += `<FOB/>`;
+    out += tag("PURCHASEORDERNO", h.PURCHASEORDERNO);
+    out += tag("WAREHOUSEID", h.WAREHOUSEID);
+    out += tag("DESCRIPTION", h.DESCRIPTION);
+    out += tag("SHIPDATE", h.SHIPDATE || h.INVOICEDATE);
+    out += tag("DELIVERYORDER", h.DELIVERYORDER);
+    out += tag("FISCALRATE", num(h.FISCALRATE,1));
+    out += tag("TAXDATE", h.TAXDATE || h.INVOICEDATE);
+    out += tag("CUSTOMERID", h.CUSTOMERID);
+    out += `<SALESMANID><LASTNAME></LASTNAME>` + tag("FIRSTNAME", h.SALESMANID) + `</SALESMANID>`;
+    out += tag("PRINTED", 0);
+    out += tag("SHIPTO1", h.SHIPTO1);
+    out += tag("SHIPTO2", h.SHIPTO2);
+    out += tag("SHIPTO3", h.SHIPTO3);
+    out += tag("SHIPTO4", h.SHIPTO4);
+    out += tag("SHIPTO5", h.SHIPTO5);
+    out += tag("ARACCOUNT", h.ARACCOUNT);
+    out += tag("TAXFORMNUMBER", h.TAXFORMNUMBER);
+    out += tag("TAXFORMCODE", h.TAXFORMCODE);
+    out += tag("CURRENCYNAME", h.CURRENCYNAME || "IDR");
+    out += `<AUTOMATICINSERTGROUPING/>`;
+    out += `</SALESINVOICE>`;
+  });
+
+  out += `</TRANSACTIONS></NMEXML>`;
+  return out;
+}
+
+function highlightXml(xml){
+  return escapeHtml(xml)
+    .replace(/(&lt;\/?)([A-Za-z0-9_]+)/g, `$1<span class="xml-tag">$2</span>`)
+    .replace(/([A-Za-z0-9_]+)(=)(&quot;[^&]*&quot;)/g, `<span class="xml-attr">$1</span>$2<span class="xml-val">$3</span>`);
+}
+
+function doConvert(){
+  const xml = buildXml();
+  state.xml = xml;
+
+  $("summaryCard").classList.add("hidden");
+  $("resultCard").classList.remove("hidden");
+  setStep(3);
+
+  const totalItems = state.invoices.reduce((s,inv)=>s+inv.items.length,0);
+  $("resultTitle").textContent = "Konversi berhasil";
+  $("resultSub").textContent = `${state.invoices.length} invoice · ${totalItems} baris barang siap diimport ke Accurate 5.`;
+  $("xmlPreview").innerHTML = highlightXml(xml);
+  $("downloadBtn").onclick = downloadXml;
+  $("resetBtn2").onclick = resetAll;
+}
+
+$("previewToggle").addEventListener("click", ()=>{
+  $("previewToggle").classList.toggle("open");
+  $("xmlPreview").classList.toggle("show");
+});
+
+function downloadXml(){
+  const blob = new Blob([state.xml], {type:"application/xml"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const base = state.fileName.replace(/\.(xlsx|xls)$/i,"") || "sales_invoice";
+  a.href = url;
+  a.download = base + ".xml";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function resetAll(){
+  state = { rows: [], invoices: [], errors: [], fileName: "", fileSize: 0 };
+  fileInput.value = "";
+  $("uploadCard").classList.remove("hidden");
+  $("summaryCard").classList.add("hidden");
+  $("resultCard").classList.add("hidden");
+  $("previewToggle").classList.remove("open");
+  $("xmlPreview").classList.remove("show");
+  setStep(1);
+}
+</script>
+</body>
+</html>

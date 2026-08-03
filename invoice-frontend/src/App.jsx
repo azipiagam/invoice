@@ -7,6 +7,7 @@ import ErrorRoundedIcon from "@mui/icons-material/ErrorRounded";
 import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 import WorkspaceCard from "./components/WorkspaceCard";
+import SiXmlConverter from "./components/SiXmlConverter";
 import { AuthProvider, useAuth } from "./auth/AuthContext";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import { BackgroundMain, Header, Sidebar } from "./templateComponents";
@@ -64,6 +65,15 @@ function InvoiceApp() {
   })
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [sidebarMobileOpen, setSidebarMobileOpen] = useState(false);
+  const [pathname, setPathname] = useState(window.location.pathname);
+
+  useEffect(() => {
+    const handlePopState = () => setPathname(window.location.pathname);
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
+  const isSiXmlRoute = pathname === "/si-xml-converter";
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [outputFolder, setOutputFolder] = useState("invoices_output");
@@ -284,7 +294,7 @@ function InvoiceApp() {
       <Sidebar
         collapsed={sidebarCollapsed}
         mobileOpen={sidebarMobileOpen}
-        activePath="/"
+        activePath={pathname}
         userName={user?.name ?? "User"}
         userRole={user?.job_position ?? user?.department ?? "Invoice System"}
         onToggleCollapse={() => setSidebarCollapsed((v) => !v)}
@@ -295,29 +305,33 @@ function InvoiceApp() {
       <div className="dashboard-stage">
         <Header
           title="Bill Forge"
-          breadcrumb={[{ label: "Invoice Generator", active: true }]}
+          breadcrumb={[{ label: isSiXmlRoute ? "Excel Convert XML" : "Invoice Generator", active: true }]}
           showMenuButton
           onMenuToggle={() => setSidebarMobileOpen((v) => !v)}
-          onReset={handleReset}
+          onReset={isSiXmlRoute ? undefined : handleReset}
         />
 
         <main className="dashboard-main dashboard-main--no-scroll">
-          <WorkspaceCard
-            selectedFile={selectedFile}
-            outputFolder={outputFolder}
-            setOutputFolder={setOutputFolder}
-            onFileChange={handleFileChange}
-            onGenerate={handleGenerate}
-            isProcessing={isProcessing}
-            jobStatus={jobStatus}
-            statusText={statusText}
-            current={currentCount}
-            total={totalCount}
-            currentInvoice={currentInvoice}
-            progress={progress}
-            result={result}
-            history={history}
-          />
+          {isSiXmlRoute ? (
+            <SiXmlConverter />
+          ) : (
+            <WorkspaceCard
+              selectedFile={selectedFile}
+              outputFolder={outputFolder}
+              setOutputFolder={setOutputFolder}
+              onFileChange={handleFileChange}
+              onGenerate={handleGenerate}
+              isProcessing={isProcessing}
+              jobStatus={jobStatus}
+              statusText={statusText}
+              current={currentCount}
+              total={totalCount}
+              currentInvoice={currentInvoice}
+              progress={progress}
+              result={result}
+              history={history}
+            />
+          )}
         </main>
       </div>
 
